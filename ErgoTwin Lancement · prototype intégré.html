@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ErgoTwin Lancement · prototype intégré</title>
+<style>:root{--bg:#F4F6F8;--card:#fff;--ink:#17212B;--mut:#5B6877;--ln:#DDE3E9;--g:#2FB56F;--o:#F5A524;--r:#E5484D;--b:#2F6FD0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:light}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45}
+h1,h2,h3,p{margin:0}h2{font-size:20px}h3{font-size:15px;margin-bottom:10px;display:flex;gap:10px;align-items:center;justify-content:space-between}
+button{font:inherit;cursor:pointer}code{background:#EEF2F6;padding:1px 6px;border-radius:5px;font-size:12.5px}
+.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:10px 16px;background:#14213D;color:#fff;position:sticky;top:0;z-index:30}
+.brand b{font-size:17px;margin-right:8px}.brand span{color:#B8C2D9;font-size:12.5px}
+#nav{display:flex;gap:4px;background:rgba(255,255,255,.08);padding:4px;border-radius:99px;margin:0 auto}
+#nav button{border:0;background:none;color:#D6DCEA;padding:7px 15px;border-radius:99px;font-weight:600}#nav button.on{background:#fff;color:#14213D}
+.sim{display:flex;gap:8px;align-items:center}.sim .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9FB0CC}.sim b{font-size:18px;font-variant-numeric:tabular-nums}.sim small{color:#9FB0CC;min-width:84px}
+.btn{border:1px solid var(--ln);background:#fff;color:var(--ink);border-radius:9px;padding:7px 12px;font-weight:600}.btn.sm{padding:4px 9px;font-size:12.5px}.btn.go{background:var(--g);border-color:var(--g);color:#fff}.btn.big{font-size:28px;padding:10px 40px}
+.top .btn{background:#2B3A5C;border-color:#2B3A5C;color:#fff}
+.demo-note{background:#FFF7E6;border-bottom:1px solid #F3DDAE;color:#7A5300;font-size:12.5px;padding:6px 16px}
+main{padding:14px 16px 40px;max-width:1360px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.note{color:var(--mut);font-size:12.5px;margin-top:6px}.eyebrow{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}.chk{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;cursor:pointer}.chk.big{font-size:14px;margin:6px 0;display:flex}
+.bdg{display:inline-block;min-width:30px;text-align:center;border-radius:99px;padding:2px 8px;font-weight:700;font-size:12px;color:#fff}.bdg.R{background:var(--r)}.bdg.O{background:var(--o)}.bdg.G{background:var(--g)}
+table{border-collapse:collapse;width:100%}th{text-align:left;font-size:11.5px;color:var(--mut);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--ln)}td{padding:8px;border-bottom:1px solid var(--ln);vertical-align:middle}.tablewrap{overflow-x:auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:12px}.kpi{background:#fff;border:1px solid var(--ln);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.kpi span{color:var(--mut);font-size:12.5px}.kpi b{font-size:28px;font-variant-numeric:tabular-nums}.kpi small{font-size:14px;color:var(--mut);font-weight:600}.kpi em{font-style:normal;font-size:12px;color:var(--mut)}
+.headline{font-size:17px;font-weight:600;margin:4px 0 12px}
+.tabs{display:flex;gap:6px;margin:8px 0 12px;overflow-x:auto}.tabs button{border:1px solid var(--ln);background:#fff;border-radius:10px;padding:9px 14px;font-weight:600;white-space:nowrap}.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}.tabs.sm button{padding:6px 10px;font-size:12.5px;font-weight:500}
+.etop{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}.who{font-size:12.5px;color:var(--mut)}
+.login{max-width:440px;margin:40px auto}.login form{display:grid;gap:10px;margin-top:14px}.login label{display:grid;gap:4px;font-weight:600;font-size:13px}.login input{font:inherit;padding:9px 11px;border:1px solid var(--ln);border-radius:9px}.err{color:var(--r);font-weight:600;min-height:18px}
+/* jumeau */
+.twin-wrap{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:12px}.twin{position:relative;height:620px;border-radius:14px;overflow:hidden;background:#EEF0F2;border:1px solid var(--ln)}
+.twin canvas.gl{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}.twin .labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lbl{position:absolute;transform:translate(-50%,-100%);font-size:11px;white-space:nowrap;padding:2px 6px;border-radius:5px;background:rgba(20,33,61,.82);color:#fff}
+.stag{position:absolute;transform:translate(-50%,-110%);display:flex;gap:4px;align-items:center;background:#fff;border-radius:99px;padding:2px 7px;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,.15);white-space:nowrap}.stag i{width:9px;height:9px;border-radius:50%;display:block}.stag em{color:var(--r);font-style:normal;font-weight:700}
+.tw-tools{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.92);border:1px solid var(--ln);border-radius:12px;padding:6px 10px;max-width:calc(100% - 20px)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.tile{border-radius:10px;padding:7px;background:#F4F6F8}.tile b{display:block;font-size:18px}.tile span{font-size:11px;color:var(--mut)}.tile.G b{color:#1E8A52}.tile.O b{color:#B7791F}.tile.R b{color:var(--r)}
+.lrow{display:grid;grid-template-columns:12px 34px 1fr;gap:2px 8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--ln)}.lrow i{width:10px;height:10px;border-radius:50%}.lrow small{grid-column:2/4;color:var(--mut)}.zbar{grid-column:2/4;display:flex;gap:3px}.zbar span{height:7px;border-radius:4px}.zbar .R{background:var(--r)}.zbar .O{background:var(--o)}.zbar .G{background:var(--g)}
+.prevbox{border-color:var(--b);background:#EEF4FD}
+.rec{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--ln)}.tagrow{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}.tg{font-size:11.5px;background:#F0F2F5;border-radius:6px;padding:2px 7px}.tg.n{background:#E6EEFB;color:#2453A6}.tg.m{background:#E3F5EC;color:#1E7A4A}
+.spark{width:90px;height:24px;color:#5B6877}
+.wi{display:grid;grid-template-columns:360px minmax(0,1fr);gap:12px;align-items:start}.rg{display:grid;gap:3px;margin:10px 0}.rg input[type=range]{width:100%;accent-color:var(--g)}.rg small{color:var(--mut);font-size:11.5px}.rg input[type=number]{font:inherit;padding:6px 8px;border:1px solid var(--ln);border-radius:8px}
+.verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:12px}.vd{border-radius:12px;padding:10px 12px;background:#F4F6F8;display:grid;gap:4px}.vd.ok{background:#E3F5EC}.vd.bad{background:#FDE8E9}.vd small{color:var(--mut)}
+/* médecin */
+.drow .row{all:unset;display:flex;gap:12px;align-items:center;width:100%;cursor:pointer}.rk{width:28px;height:28px;border-radius:50%;background:#EEF2F6;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}.nm{flex:1;min-width:0}.nm small{display:block;color:var(--mut)}
+.bar{height:7px;background:#EEF2F6;border-radius:8px;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%}.det{display:none;margin-top:10px;border-top:1px dashed var(--ln);padding-top:10px}.drow.open .det{display:block}
+.zline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}.zline small{color:var(--mut)}.fl{display:inline-block;background:#F0F2F5;border-radius:7px;padding:2px 7px;font-size:11.5px}.fl.on{background:var(--r);color:#fff}
+.hist{display:flex;align-items:flex-end;gap:2px;height:30px}.hist i{flex:1;background:var(--o);border-radius:2px 2px 0 0}
+.rules li{margin:5px 0}
+/* liaison */
+.arch{width:100%;max-width:1000px;height:auto;display:block;margin:0 auto}.arch .zone{fill:none;stroke:#C9D2DC;stroke-dasharray:4 4}.arch .zt{font-size:10.5px;fill:#7B8794}.arch .nd rect{fill:#fff;stroke:#9DB0C6}.arch .t1{font-size:12px;font-weight:700;fill:#17212B}.arch .t2{font-size:10px;fill:#5B6877}.arch .cnt{font-size:11px;fill:#2F6FD0;font-weight:700}
+.arch .ed{stroke:#B5C0CC;stroke-width:1.6}.arch .ed.hot{animation:hot 1.1s ease-out}@keyframes hot{0%{stroke:#2FB56F;stroke-width:5}100%{stroke:#B5C0CC;stroke-width:1.6}}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}.log{max-height:520px;overflow:auto;font-size:12px}.lg{border-bottom:1px solid var(--ln);padding:5px 0;display:grid;grid-template-columns:44px 1fr;gap:2px 8px}.lg .ts{color:var(--mut)}.lg .fr{grid-column:2;color:var(--mut);font-size:11px}.lg pre{grid-column:2;margin:0;white-space:pre-wrap;word-break:break-all;font-size:11px;color:#34495E}.lg.priv pre{color:#7A5300}
+#lf{font:inherit;font-weight:400;font-size:12px;padding:4px 8px;border:1px solid var(--ln);border-radius:8px;width:240px}
+.wiring{width:100%;height:auto}.wiring .pcb{fill:#1F3B57}.wiring .sensor{fill:#3A3F47}.wiring .psu{fill:#F4F6F8;stroke:#C9D2DC}.wiring .h{font-size:12.5px;font-weight:700;fill:#17212B}.wiring .p{font-size:11px;fill:#17212B}.wiring .p2{font-size:10px;fill:#5B6877}
+.wiring .w{font-size:12px;fill:#fff;font-weight:600}
+/* tablette */
+.kdemo{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#14213D;color:#fff;border-radius:12px;padding:8px 12px;margin-bottom:12px;font-size:12.5px}.kdemo b{margin-right:8px}.kdemo button{background:#2B3A5C;color:#fff;border:0;border-radius:8px;padding:6px 10px}.kdemo button.on{background:var(--g)}.kdemo .sep{flex:1}
+.ktab{display:flex;flex-direction:column;align-items:center}.kframe{width:min(100%,860px);aspect-ratio:16/10;background:#111;border-radius:30px;padding:18px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+#k-app{width:100%;height:100%;background:#fff;border-radius:16px;overflow:auto}
+.kpt{min-height:100%;display:flex;align-items:center;justify-content:center;padding:22px;text-align:center;color:#111}.kpt.rtl{direction:rtl}.kst{width:100%;max-width:620px}
+.kpt .fp{width:200px;height:200px;border:0;background:none;padding:0;position:relative}.kpt .fp svg{width:100%;height:100%}.kpt .fp .ln{position:absolute;left:12%;right:12%;height:4px;background:#16a34a;border-radius:4px;box-shadow:0 0 14px #16a34a;top:15%;opacity:0}
+.kpt .fp.scan .ln{opacity:1;animation:sc 1s ease-in-out infinite alternate}@keyframes sc{to{top:80%}}.kpt .fp:not(.scan){animation:pl 2.2s ease-in-out infinite}@keyframes pl{50%{transform:scale(1.04)}}
+.kpt h1{font-size:26px;margin:14px 0 6px;color:#14532d}.kpt .sub{color:#555;font-size:16px}.pid{font-family:ui-monospace,monospace;font-size:20px;color:#2F6FD0}
+.kpt .chk{width:110px;height:110px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;margin:0 auto;animation:pop .4s ease}.kpt .chk.sm{width:70px;height:70px}.kpt .chk svg{width:60%;height:60%}@keyframes pop{from{transform:scale(.3);opacity:0}}
+.kmenu{display:grid;gap:10px;margin-top:16px}.kmenu button{font-size:19px;font-weight:700;padding:16px;border-radius:16px;border:2px solid #d1d5db;background:#fff}.kmenu button.kend{background:#14532d;color:#fff;border-color:#14532d}
+.kgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:16px}.kgrid button{border:3px solid #d1d5db;background:#fff;border-radius:18px;padding:14px 6px;display:grid;gap:4px}.kgrid b{font-size:44px;color:#16a34a}.kgrid span{font-weight:700}.kgrid small{color:#666}.kgrid .taken{opacity:.55}.kgrid .mine{border-color:#16a34a;background:#f0fdf4}
+.poste{margin-top:16px;border:3px solid #16a34a;border-radius:20px;padding:12px 24px;display:inline-block}.poste small{display:block;font-size:16px;color:#555}.poste strong{font-size:60px;line-height:1;color:#16a34a}
+.zcs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}.zc{border-radius:14px;padding:10px 6px;display:grid;gap:2px;border:2px solid}.zc b{font-size:14px}.zc span{font-weight:700}.zc small{font-size:11.5px;color:#444}.zc.G{border-color:#16a34a;background:#f0fdf4}.zc.O{border-color:#d97706;background:#fffbeb}.zc.R{border-color:#dc2626;background:#fef2f2}
+.qt{font-size:22px;font-weight:700;line-height:1.45;margin:10px 0 16px}.ans{display:flex;gap:14px}.ans button{flex:1;font-size:26px;font-weight:700;padding:18px 8px;border-radius:18px;border:3px solid}.yes{background:#fef2f2;border-color:#dc2626;color:#b91c1c}.no{background:#f0fdf4;border-color:#16a34a;color:#15803d}
+.alert{background:#fff7ed;border:2px solid #d97706;color:#7c2d12;border-radius:16px;padding:14px 16px;font-size:18px;line-height:1.6;margin-bottom:18px}
+.dots{display:flex;gap:8px;justify-content:center;margin:0 0 10px}.dots i{width:11px;height:11px;border-radius:50%;background:#d1d5db}.dots i.d{background:#16a34a}.grp{display:inline-block;background:#16a34a;color:#fff;border-radius:20px;padding:4px 18px;font-size:16px;font-weight:700}
+@media(max-width:1000px){.twin-wrap,.wi,.grid2{grid-template-columns:1fr}.twin{height:460px}.kgrid,.zcs{grid-template-columns:repeat(3,1fr)}#nav{margin:0}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><b>ErgoTwin</b><span>Poste Lancement · TLS · prototype intégré</span></div>
+  <nav id="nav"></nav>
+  <div class="sim" title="Horloge de démonstration (accélérée)">
+    <span class="lbl">Simulation</span><b id="clock">--:--</b><small id="phase"></small>
+    <button id="play" class="btn sm">⏸</button>
+    <select id="speed" class="btn sm"><option value="30">×30</option><option value="60" selected>×60</option><option value="180">×180</option><option value="600">×600</option></select>
+    <button id="eod" class="btn sm">Aller à 16h55</button>
+  </div>
+</header>
+<div class="demo-note">Prototype de démonstration : les angles viennent d'un modèle de tâche qui simule le pipeline vision, avec des données d'exemple. Aucune vidéo, aucun visage, aucune donnée réelle.</div>
+<main>
+  <section class="view" id="v-kiosk"></section>
+  <section class="view" id="v-engineer" hidden></section>
+  <section class="view" id="v-doctor" hidden></section>
+  <section class="view" id="v-liaison" hidden></section>
+</main>
+<script>window.ERGOTWIN_FLOOR = {"name": "Atelier TLS – section Lancement (Cam-03 + 2 caméras rapprochées)", "units": "mètres ; origine = coin arrière gauche (derrière le rayonnage), x vers la droite vu depuis Cam-03, y vers Cam-03 ; yaw en degrés de +x vers +y", "source": {"estimated_from": "une image de Cam-03 (16/11/2026 10:24:37)", "method": "pose de la caméra ajustée par moindres carrés sur les coins de la table du milieu, un pied de table et trois personnes debout (table supposée 0,90 m de haut et 0,80 m de large, personnes 1,65 m) ; tout le reste est reprojeté sur le sol", "fit_rms_px": 12.4, "check": "la largeur de la table avant ressort à 0,85-0,89 m sans contrainte", "confidence": "±0,3 m près des tables, ±0,8 m au fond ; les zones hors champ (à gauche des chariots, derrière le rayonnage, à droite du pilier) sont supposées - à mesurer au mètre ruban"}, "width": 17.0, "height": 16.5, "room_height": 7.0, "cell": 0.2, "target_height": 1.0, "obstacles": [{"id": "T1", "label": "Table 1 (rangée milieu)", "type": "table", "x": 4.2, "y": 8.8, "w": 5.9, "h": 0.8, "height": 0.9}, {"id": "T2", "label": "Table 2 (rangée avant)", "type": "table", "x": 2.6, "y": 11.13, "w": 6.5, "h": 0.85, "height": 0.9}, {"id": "RK", "label": "Rayonnage palettes", "type": "rack", "x": 4.5, "y": 2.6, "w": 5.6, "h": 1.15, "height": 3.2}, {"id": "CB", "label": "Bacs blancs empilés", "type": "crate", "x": 2.85, "y": 9.3, "w": 1.3, "h": 0.8, "height": 1.1}, {"id": "C1", "label": "Chariot grillagé 1", "type": "cage", "x": 0.9, "y": 3.0, "w": 1.8, "h": 1.4, "height": 1.9}, {"id": "C2", "label": "Chariot grillagé 2", "type": "cage", "x": 0.9, "y": 4.6, "w": 1.8, "h": 1.4, "height": 1.9}, {"id": "C3", "label": "Chariot grillagé 3", "type": "cage", "x": 0.9, "y": 6.2, "w": 1.8, "h": 1.4, "height": 1.9}, {"id": "C4", "label": "Chariot grillagé 4", "type": "cage", "x": 0.9, "y": 7.8, "w": 1.8, "h": 1.4, "height": 1.9}, {"id": "C5", "label": "Stock grillagé (fond)", "type": "cage", "x": 0.8, "y": 0.5, "w": 3.2, "h": 1.7, "height": 1.9}, {"id": "PC", "label": "Poste informatique", "type": "desk", "x": 11.7, "y": 6.2, "w": 0.75, "h": 0.9, "height": 1.0}, {"id": "PL", "label": "Pilier (extincteur)", "type": "pillar", "x": 12.5, "y": 7.1, "w": 0.8, "h": 0.7, "height": 7.0}], "zones": [{"id": "AI", "label": "Allée principale", "type": "aisle", "x": 2.8, "y": 3.9, "w": 8.7, "h": 4.3, "prior": 1.1}, {"id": "RZ", "label": "Prélèvement rayonnage", "type": "rack", "x": 4.5, "y": 3.75, "w": 5.6, "h": 0.65, "prior": 1.3}, {"id": "CZ", "label": "Zone chariots grillagés", "type": "rack", "x": 2.7, "y": 3.0, "w": 0.7, "h": 6.2, "prior": 1.2}, {"id": "W1", "label": "Postes table 1", "type": "work", "table": "T1", "x": 4.2, "y": 8.2, "w": 5.9, "h": 0.6, "prior": 1.6}, {"id": "W2", "label": "Postes table 2", "type": "work", "table": "T2", "x": 2.6, "y": 10.5, "w": 6.5, "h": 0.63, "prior": 1.6}, {"id": "WS", "label": "Poste informatique", "type": "work", "table": "PC", "x": 11.0, "y": 6.0, "w": 0.7, "h": 1.4, "prior": 1.3}, {"id": "LN", "label": "Allée latérale (marquage jaune)", "type": "aisle", "x": 11.0, "y": 8.0, "w": 1.6, "h": 8.5, "prior": 1.0}, {"id": "EX", "label": "Porte (fond droite)", "type": "exit", "x": 15.6, "y": 0.3, "w": 1.0, "h": 1.6, "prior": 1.0}], "cameras": [{"id": "CAM03", "label": "Cam-03", "x": 7.3, "y": 16.0, "height": 5.86, "yaw": -90.4, "pitch": 32.5, "fov": 62.6, "vfov": 37.9, "range": 24.0}], "markers": {"0": [4.0, 4.6], "1": [10.8, 4.6], "2": [11.4, 9.9], "3": [3.6, 10.35], "4": [7.3, 6.0], "5": [7.3, 10.2]}, "markings": [{"type": "line", "color": "#e8c21a", "points": [[12.6, 8.0], [12.6, 16.3]], "width": 0.08}, {"type": "line", "color": "#e8c21a", "points": [[11.0, 10.4], [11.0, 16.3]], "width": 0.08}], "props": [{"type": "worker", "pose": "sitting", "x": 5.42, "y": 8.35, "facing": 90}, {"type": "worker", "pose": "sitting", "x": 6.38, "y": 8.35, "facing": 90}, {"type": "worker", "pose": "sitting", "x": 7.25, "y": 8.35, "facing": 90}, {"type": "worker", "pose": "sitting", "x": 8.36, "y": 8.35, "facing": 90}, {"type": "worker", "pose": "sitting", "x": 9.2, "y": 8.35, "facing": 90}, {"type": "worker", "pose": "sitting", "x": 4.99, "y": 10.72, "facing": 90}, {"type": "worker", "pose": "sitting", "x": 5.99, "y": 10.72, "facing": 90}, {"type": "worker", "pose": "sitting", "x": 8.1, "y": 10.72, "facing": 90}, {"type": "worker", "pose": "standing", "x": 10.04, "y": 5.41, "facing": 180}, {"type": "worker", "pose": "standing", "x": 3.72, "y": 5.38, "facing": -90}, {"type": "worker", "pose": "standing", "x": 12.4, "y": 2.9, "facing": 90}, {"type": "worker", "pose": "standing", "x": 2.83, "y": 7.9, "facing": 0}, {"type": "worker", "pose": "standing", "x": 12.1, "y": 6.65, "facing": 180}, {"type": "bin", "x": 9.45, "y": 8.9, "w": 0.6, "h": 0.45, "z": 0.9, "height": 0.2}, {"type": "bin", "x": 8.5, "y": 11.25, "w": 0.6, "h": 0.45, "z": 0.9, "height": 0.2}, {"type": "cart", "x": 10.2, "y": 10.6, "w": 0.8, "h": 0.6, "height": 1.1, "note": "chariot mobile, absent de certaines images"}], "lancement": {"table": "T1", "seats": [0, 1, 2, 3, 4], "stations": ["P01", "P02", "P03", "P04", "P05"], "note": "Les 5 places assises de la table 1 sont les 5 postes du Lancement (P01 tri, P02-P03 contrôle, P04-P05 étiquetage)."}, "close_cameras": [{"id": "CAML1", "label": "Cam-L1 (rapprochée)", "x": 6.0, "y": 10.05, "height": 2.3, "yaw": -90, "pitch": 58, "fov": 95, "vfov": 60, "range": 4.0, "new": true}, {"id": "CAML2", "label": "Cam-L2 (rapprochée)", "x": 8.6, "y": 10.05, "height": 2.3, "yaw": -90, "pitch": 58, "fov": 95, "vfov": 60, "range": 4.0, "new": true}]};</script>
+<script>// In-browser coverage + camera suggestion for the what-if mode.
+// Mirrors twin/floor.py (Grid) and twin/coverage.py + twin/recommend.py exactly, so the
+// numbers shown while dragging match what the Python backend computes.
+(function (global) {
+  "use strict";
+  const MIN_RANGE = 0.3;
+
+  function inRect(x, y, r) { return x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h; }
+
+  function buildGrid(floor) {
+    const cell = floor.cell || 0.2, W = floor.width, H = floor.height;
+    const cols = Math.ceil(W / cell - 1e-9), rows = Math.ceil(H / cell - 1e-9);
+    const hmRes = cell / 2, hc = Math.ceil(W / hmRes - 1e-9), hr = Math.ceil(H / hmRes - 1e-9);
+    const hm = new Float32Array(hr * hc);
+    const obs = floor.obstacles || [];
+    for (const ob of obs) {
+      const h = ob.height == null ? 1.0 : ob.height;
+      const c0 = Math.max(0, Math.floor(ob.x / hmRes) - 1), c1 = Math.min(hc - 1, Math.ceil((ob.x + ob.w) / hmRes) + 1);
+      const r0 = Math.max(0, Math.floor(ob.y / hmRes) - 1), r1 = Math.min(hr - 1, Math.ceil((ob.y + ob.h) / hmRes) + 1);
+      for (let iy = r0; iy <= r1; iy++) for (let ix = c0; ix <= c1; ix++) {
+        if (inRect((ix + 0.5) * hmRes, (iy + 0.5) * hmRes, ob)) hm[iy * hc + ix] = Math.max(hm[iy * hc + ix], h);
+      }
+    }
+    const walkable = new Uint8Array(rows * cols);
+    const zoneIdx = new Int16Array(rows * cols).fill(-1);
+    const zones = floor.zones || [];
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      const x = (c + 0.5) * cell, y = (r + 0.5) * cell;
+      let ok = 1;
+      for (const ob of obs) if (inRect(x, y, ob)) { ok = 0; break; }
+      walkable[r * cols + c] = ok;
+      for (let i = 0; i < zones.length; i++) if (inRect(x, y, zones[i])) zoneIdx[r * cols + c] = i;
+    }
+    return { cell, W, H, cols, rows, hmRes, hc, hr, hm, walkable, zoneIdx,
+             targetH: floor.target_height == null ? 1.0 : floor.target_height };
+  }
+
+  function angDiff(a, b) {
+    const TWO = 2 * Math.PI;
+    return Math.abs((((a - b + Math.PI) % TWO) + TWO) % TWO - Math.PI);
+  }
+
+  // Adds 1 to out[i] for every walkable cell this camera sees.
+  function addCamera(g, cam, out) {
+    if (cam.enabled === false) return;
+    const cx = cam.x, cy = cam.y, ch = cam.height == null ? 2.5 : cam.height;
+    const rng = cam.range == null ? 10 : cam.range;
+    const yaw = (cam.yaw || 0) * Math.PI / 180, half = (cam.fov == null ? 70 : cam.fov) * Math.PI / 360;
+    const th = g.targetH, S = Math.ceil(rng / g.hmRes), hm = g.hm, hc = g.hc, hr = g.hr, res = g.hmRes;
+    const useV = cam.vfov != null && cam.pitch != null;
+    const pv = (cam.pitch || 0) * Math.PI / 180, hv = (cam.vfov || 0) * Math.PI / 360;
+    for (let r = 0; r < g.rows; r++) for (let c = 0; c < g.cols; c++) {
+      const i = r * g.cols + c;
+      if (!g.walkable[i]) continue;
+      const dx = (c + 0.5) * g.cell - cx, dy = (r + 0.5) * g.cell - cy;
+      const d = Math.hypot(dx, dy);
+      if (d > rng || d < MIN_RANGE) continue;
+      if (angDiff(Math.atan2(dy, dx), yaw) > half) continue;
+      if (useV) { const dep = Math.atan2(ch, d); if (dep < pv - hv || dep > pv + hv) continue; }
+      let blocked = false;
+      for (let k = 1; k < S; k++) {
+        const f = k / S;
+        if (f * d < 0.2) continue;
+        let ix = Math.floor((cx + f * dx) / res), iy = Math.floor((cy + f * dy) / res);
+        ix = ix < 0 ? 0 : ix >= hc ? hc - 1 : ix;
+        iy = iy < 0 ? 0 : iy >= hr ? hr - 1 : iy;
+        if (hm[iy * hc + ix] > ch + f * (th - ch)) { blocked = true; break; }
+      }
+      if (!blocked) out[i] += 1;
+    }
+  }
+
+  function coverage(g, cameras) {
+    const out = new Uint8Array(g.rows * g.cols);
+    for (const cam of cameras) addCamera(g, cam, out);
+    return out;
+  }
+
+  function stats(g, count) {
+    let n = 0, b = 0, s = 0, m = 0;
+    for (let i = 0; i < count.length; i++) {
+      if (!g.walkable[i]) continue;
+      n++;
+      if (count[i] === 0) b++; else if (count[i] === 1) s++; else m++;
+    }
+    const p = v => (n ? Math.round(1000 * v / n) / 10 : 0);
+    return { cells: n, blind: p(b), single: p(s), multi: p(m), seen: p(s + m) };
+  }
+
+  function score(g, count) {
+    let n = 0, s = 0, m = 0;
+    for (let i = 0; i < count.length; i++) {
+      if (!g.walkable[i]) continue;
+      n++; if (count[i] >= 1) s++; if (count[i] >= 2) m++;
+    }
+    return n ? s / n + 0.3 * m / n : 0;
+  }
+
+  function wallCandidates(floor, step, inset) {
+    const W = floor.width, H = floor.height, pts = [];
+    const nx = Math.max(Math.floor(W / step), 1), ny = Math.max(Math.floor(H / step), 1);
+    for (let i = 0; i <= nx; i++) {
+      const x = Math.min(Math.max(i * W / nx, inset), W - inset);
+      pts.push([x, inset], [x, H - inset]);
+    }
+    for (let j = 1; j < ny; j++) { const y = j * H / ny; pts.push([inset, y], [W - inset, y]); }
+    return pts;
+  }
+
+  // Best single camera move (moveId=null tries every camera) or best new camera (add=true).
+  function suggest(floor, opts) {
+    opts = opts || {};
+    const W = floor.width, H = floor.height;
+    let cell = Math.max(floor.cell || 0.2, Math.min(W, H) / 40, 0.2);
+    if (Math.max(W, H) > 12) cell = Math.max(cell, 0.4);
+    const coarse = buildGrid(Object.assign({}, floor, { cell }));
+    const step = Math.max(0.5, Math.round(Math.max(W, H) / 24 * 10) / 10);
+    const cands = wallCandidates(floor, step, 0.15);
+    const offsets = [-40, -20, 0, 20, 40];
+    const targets = opts.add ? [null] : (opts.move ? [opts.move] : floor.cameras.map(c => c.id));
+    let best = null;
+    for (const tid of targets) {
+      const others = floor.cameras.filter(c => c.id !== tid);
+      const template = tid == null ? floor.cameras[0] : floor.cameras.find(c => c.id === tid);
+      const base = coverage(coarse, others);
+      for (const [x, y] of cands) {
+        const look = Math.atan2(H / 2 - y, W / 2 - x) * 180 / Math.PI;
+        for (const off of offsets) {
+          const cam = Object.assign({}, template, { x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100,
+                                                    yaw: Math.round((look + off) * 10) / 10 });
+          const cnt = base.slice();
+          addCamera(coarse, cam, cnt);
+          const s = score(coarse, cnt);
+          if (!best || s > best.s) best = { s, tid, cam };
+        }
+      }
+    }
+    const full = buildGrid(floor);
+    const before = stats(full, coverage(full, floor.cameras));
+    let cam = best.cam, cameras;
+    if (best.tid == null) {
+      cam = Object.assign({}, cam, { id: "N" + (floor.cameras.length + 1), label: "New cam" });
+      cameras = floor.cameras.concat([cam]);
+    } else {
+      cameras = floor.cameras.map(c => (c.id === best.tid ? cam : c));
+    }
+    const after = stats(full, coverage(full, cameras));
+    const from = best.tid == null ? null : floor.cameras.find(c => c.id === best.tid);
+    return { action: best.tid == null ? "add" : "move", camera: cam.id, cam,
+             from: from ? { x: from.x, y: from.y, yaw: from.yaw } : null,
+             to: { x: cam.x, y: cam.y, yaw: cam.yaw }, before, after,
+             gain_seen: Math.round((after.seen - before.seen) * 10) / 10,
+             gain_multi: Math.round((after.multi - before.multi) * 10) / 10 };
+  }
+
+  global.Coverage = { buildGrid, coverage, addCamera, stats, score, suggest };
+  if (typeof module !== "undefined") module.exports = global.Coverage;
+})(typeof window !== "undefined" ? window : globalThis);
+
+// Procedural 3D model of a floor layout (config/floor*.json) - no dependencies.
+// Used by the in-browser viewer (web/twin3d.js) and by the GLB/OBJ exporter
+// (tools/floor_to_3d.js). Output is in glTF convention: meters, Y up.
+// Floor (x, y, z-up) maps to 3D (X = x, Y = z, Z = y).
+(function (global) {
+  "use strict";
+
+  function hex(c, a) {
+    const n = parseInt(c.replace("#", ""), 16);
+    return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255, a == null ? 1 : a];
+  }
+  const C = {
+    floor: hex("#8e9398"), steel: hex("#c7ccd1"), steelDark: hex("#8d949b"), black: hex("#24272c"),
+    paper: hex("#f4f5f6"), rackBlue: hex("#2150c4"), rackOrange: hex("#d9772b"), goods: hex("#2b2e34"),
+    goods2: hex("#3a3e46"), cage: hex("#a5adb5"), cageMesh: hex("#c4cbd2", 0.18), white: hex("#eef0f2"),
+    white2: hex("#dfe3e7"), coat: hex("#2453c9"), pants: hex("#232838"), skin: hex("#d9a77e"),
+    hair: hex("#1b1b1b"), stool: hex("#6b7280"), screen: hex("#3b82c4"), red: hex("#c62828"),
+    bin: hex("#2d5be3"), wall: hex("#dfe6ee", 0.13), wallBase: hex("#6b7178"), yellow: hex("#e8c21a"),
+    cam: hex("#30353b"), frustum: hex("#5cc8ff"), grid: hex("#ffffff", 0.08), zone: hex("#ffffff", 0.35),
+  };
+
+  // ------------------------------------------------------------------ builder
+  function Builder() { this.groups = []; this.labels = []; this.cur = null; }
+  Builder.prototype.group = function (name, opts) {
+    opts = opts || {};
+    const g = { name, kind: opts.kind || "mesh", transparent: !!opts.transparent, layer: opts.layer || "model",
+                camId: opts.camId || null, p: [], n: [], c: [] };
+    this.groups.push(g); this.cur = g; return g;
+  };
+  // vertex in floor coordinates -> 3D (X=x, Y=z, Z=y)
+  Builder.prototype.v = function (x, y, z, nx, ny, nz, col) {
+    const g = this.cur;
+    g.p.push(x, z, y); g.n.push(nx, nz, ny); g.c.push(col[0], col[1], col[2], col[3]);
+  };
+  Builder.prototype.quad = function (a, b, c, d, n, col) {   // a,b,c,d: [x,y,z] floor coords
+    for (const q of [a, b, c, a, c, d]) this.v(q[0], q[1], q[2], n[0], n[1], n[2], col);
+  };
+  // oriented box: centre (cx,cy,cz), half sizes (hx,hy,hz), yaw around vertical (deg), pitch (deg, nose down)
+  Builder.prototype.obox = function (cx, cy, cz, hx, hy, hz, yaw, pitch, col) {
+    const cy_ = Math.cos((yaw || 0) * Math.PI / 180), sy_ = Math.sin((yaw || 0) * Math.PI / 180);
+    const cp = Math.cos((pitch || 0) * Math.PI / 180), sp = Math.sin((pitch || 0) * Math.PI / 180);
+    // local axes: a = forward (x), b = side (y), u = up (z)
+    const a = [cy_ * cp, sy_ * cp, -sp], b = [-sy_, cy_, 0], u = [cy_ * sp, sy_ * sp, cp];
+    const P = (i, j, k) => [cx + a[0] * hx * i + b[0] * hy * j + u[0] * hz * k,
+                            cy + a[1] * hx * i + b[1] * hy * j + u[1] * hz * k,
+                            cz + a[2] * hx * i + b[2] * hy * j + u[2] * hz * k];
+    const neg = v => [-v[0], -v[1], -v[2]];
+    this.quad(P(1, -1, -1), P(1, 1, -1), P(1, 1, 1), P(1, -1, 1), a, col);
+    this.quad(P(-1, 1, -1), P(-1, -1, -1), P(-1, -1, 1), P(-1, 1, 1), neg(a), col);
+    this.quad(P(-1, 1, -1), P(1, 1, -1), P(1, 1, 1), P(-1, 1, 1), b, col);
+    this.quad(P(1, -1, -1), P(-1, -1, -1), P(-1, -1, 1), P(1, -1, 1), neg(b), col);
+    this.quad(P(-1, -1, 1), P(1, -1, 1), P(1, 1, 1), P(-1, 1, 1), u, col);
+    this.quad(P(-1, 1, -1), P(1, 1, -1), P(1, -1, -1), P(-1, -1, -1), neg(u), col);
+  };
+  // axis-aligned box from corners (floor coords)
+  Builder.prototype.box = function (x0, y0, z0, x1, y1, z1, col) {
+    this.obox((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2, Math.abs(x1 - x0) / 2, Math.abs(y1 - y0) / 2, Math.abs(z1 - z0) / 2, 0, 0, col);
+  };
+  Builder.prototype.cyl = function (cx, cy, z0, z1, r, col, seg) {
+    seg = seg || 12;
+    for (let i = 0; i < seg; i++) {
+      const a0 = 2 * Math.PI * i / seg, a1 = 2 * Math.PI * (i + 1) / seg;
+      const c0 = Math.cos(a0), s0 = Math.sin(a0), c1 = Math.cos(a1), s1 = Math.sin(a1);
+      const am = (a0 + a1) / 2;
+      this.quad([cx + r * c0, cy + r * s0, z0], [cx + r * c1, cy + r * s1, z0], [cx + r * c1, cy + r * s1, z1], [cx + r * c0, cy + r * s0, z1],
+                [Math.cos(am), Math.sin(am), 0], col);
+      for (const [z, nz] of [[z1, 1], [z0, -1]]) {
+        this.v(cx, cy, z, 0, 0, nz, col); this.v(cx + r * c0, cy + r * s0, z, 0, 0, nz, col); this.v(cx + r * c1, cy + r * s1, z, 0, 0, nz, col);
+      }
+    }
+  };
+  Builder.prototype.sphere = function (cx, cy, cz, r, col, lat, lon) {
+    lat = lat || 7; lon = lon || 12;
+    const P = (i, j) => { const t = Math.PI * i / lat, f = 2 * Math.PI * j / lon;
+      return [Math.sin(t) * Math.cos(f), Math.sin(t) * Math.sin(f), Math.cos(t)]; };
+    for (let i = 0; i < lat; i++) for (let j = 0; j < lon; j++) {
+      const q = [P(i, j), P(i + 1, j), P(i + 1, j + 1), P(i, j + 1)];
+      const pts = q.map(n => [cx + r * n[0], cy + r * n[1], cz + r * n[2]]);
+      const tri = (k) => this.v(pts[k][0], pts[k][1], pts[k][2], q[k][0], q[k][1], q[k][2], col);
+      [0, 1, 2, 0, 2, 3].forEach(tri);
+    }
+  };
+  Builder.prototype.line = function (a, b, col) {     // only inside a "lines" group
+    this.v(a[0], a[1], a[2], 0, 0, 1, col); this.v(b[0], b[1], b[2], 0, 0, 1, col);
+  };
+  Builder.prototype.label = function (text, x, y, z, kind) { this.labels.push({ text, x, y, z, kind: kind || "object" }); };
+
+  // ------------------------------------------------------------------ objects
+  function table(B, o) {
+    const t = 0.04, z1 = o.height, x0 = o.x, x1 = o.x + o.w, y0 = o.y, y1 = o.y + o.h;
+    B.box(x0, y0, z1 - t, x1, y1, z1, C.steel);
+    const legs = Math.max(2, Math.round(o.w / 1.6) + 1);
+    for (let i = 0; i < legs; i++) {
+      const x = x0 + 0.06 + (x1 - x0 - 0.12) * i / (legs - 1);
+      for (const y of [y0 + 0.06, y1 - 0.06]) B.box(x - 0.025, y - 0.025, 0, x + 0.025, y + 0.025, z1 - t, C.steelDark);
+    }
+    B.box(x0 + 0.05, y0 + 0.08, 0.16, x1 - 0.05, y1 - 0.08, 0.19, C.steelDark);  // lower shelf
+    // work items: black product bags and white sheets, one set per ~0.95 m
+    const n = Math.max(1, Math.floor(o.w / 0.95));
+    for (let i = 0; i < n; i++) {
+      const cx = x0 + (i + 0.5) * o.w / n, cy = (y0 + y1) / 2;
+      B.box(cx - 0.2, cy - 0.17, z1, cx + 0.2, cy + 0.15, z1 + 0.14 + 0.04 * (i % 2), C.black);
+      B.box(cx + 0.24, cy - 0.15, z1, cx + 0.45, cy + 0.15, z1 + 0.004, C.paper);
+    }
+  }
+
+  function rack(B, o) {
+    const x0 = o.x, x1 = o.x + o.w, y0 = o.y, y1 = o.y + o.h, H = o.height, u = 0.04;
+    const bays = Math.max(1, Math.round(o.w / 1.15));
+    for (let i = 0; i <= bays; i++) {
+      const x = x0 + (x1 - x0) * i / bays;
+      for (const y of [y0 + u, y1 - u]) B.box(x - u, y - u, 0, x + u, y + u, H, C.rackBlue);
+    }
+    const levels = [0.12, 1.15, 2.2].filter(z => z < H - 0.5);
+    for (const z of levels) {
+      for (const y of [y0 + u, y1 - u]) B.box(x0, y - u, z, x1, y + u, z + 0.1, C.rackOrange);
+      B.box(x0 + u, y0 + u, z + 0.1, x1 - u, y1 - u, z + 0.12, C.steelDark);
+    }
+    for (let i = 0; i < bays; i++) for (let k = 0; k < levels.length; k++) {
+      const bx0 = x0 + (x1 - x0) * i / bays + 0.08, bx1 = x0 + (x1 - x0) * (i + 1) / bays - 0.08;
+      const z0 = levels[k] + 0.12, top = (k + 1 < levels.length ? levels[k + 1] : H) - 0.08;
+      const zt = z0 + Math.min(0.85, top - z0);
+      B.box(bx0, y0 + 0.1, z0, bx1, y1 - 0.1, zt, (i + k) % 2 ? C.goods : C.goods2);
+    }
+  }
+
+  function cage(B, o, mesh) {
+    const x0 = o.x, x1 = o.x + o.w, y0 = o.y, y1 = o.y + o.h, H = o.height, r = 0.02;
+    for (const [x, y] of [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]) B.box(x - r, y - r, 0.08, x + r, y + r, H, C.cage);
+    for (const z of [0.1, H / 2, H]) {
+      B.box(x0, y0 - r, z - r, x1, y0 + r, z + r, C.cage); B.box(x0, y1 - r, z - r, x1, y1 + r, z + r, C.cage);
+      B.box(x0 - r, y0, z - r, x0 + r, y1, z + r, C.cage); B.box(x1 - r, y0, z - r, x1 + r, y1, z + r, C.cage);
+    }
+    for (const [x, y] of [[x0 + 0.1, y0 + 0.1], [x1 - 0.1, y0 + 0.1], [x1 - 0.1, y1 - 0.1], [x0 + 0.1, y1 - 0.1]]) B.cyl(x, y, 0, 0.08, 0.05, C.black, 8);
+    // contents
+    B.box(x0 + 0.15, y0 + 0.15, 0.12, x1 - 0.15, y1 - 0.15, 0.7, C.goods);
+    B.box(x0 + 0.15, y0 + 0.15, H / 2 + 0.02, x1 - 0.4, y1 - 0.3, H / 2 + 0.55, C.goods2);
+    // wire mesh walls (translucent group)
+    mesh.push([x0, y0, x1, y1, H]);
+  }
+
+  function crate(B, o) {
+    const cols = Math.max(1, Math.round(o.w / 0.6)), lv = Math.max(1, Math.round(o.height / 0.36));
+    for (let i = 0; i < cols; i++) for (let k = 0; k < lv; k++) {
+      const x0 = o.x + o.w * i / cols + 0.01, x1 = o.x + o.w * (i + 1) / cols - 0.01;
+      const z0 = o.height * k / lv + 0.005, z1 = o.height * (k + 1) / lv - 0.005;
+      B.box(x0, o.y + 0.01, z0, x1, o.y + o.h - 0.01, z1, (i + k) % 2 ? C.white : C.white2);
+    }
+  }
+
+  function desk(B, o) {
+    const x0 = o.x, x1 = o.x + o.w, y0 = o.y, y1 = o.y + o.h, z = 0.78;
+    B.box(x0, y0, z - 0.03, x1, y1, z, C.white);
+    B.box(x0 + 0.03, y0 + 0.03, 0.2, x1 - 0.03, y1 - 0.03, 0.23, C.white2);
+    for (const [x, y] of [[x0 + 0.04, y0 + 0.04], [x1 - 0.04, y0 + 0.04], [x1 - 0.04, y1 - 0.04], [x0 + 0.04, y1 - 0.04]]) {
+      B.box(x - 0.02, y - 0.02, 0.08, x + 0.02, y + 0.02, z - 0.03, C.steelDark); B.cyl(x, y, 0, 0.08, 0.04, C.black, 8);
+    }
+    const mx = x1 - 0.12, my = (y0 + y1) / 2;
+    B.box(mx - 0.03, my - 0.04, z, mx + 0.03, my + 0.04, z + 0.25, C.black);
+    B.box(mx - 0.05, my - 0.28, z + 0.22, mx + 0.0, my + 0.28, z + 0.56, C.black);
+    B.box(mx - 0.056, my - 0.25, z + 0.25, mx - 0.05, my + 0.25, z + 0.53, C.screen);
+    B.box(x0 + 0.12, my - 0.22, z, x0 + 0.32, my + 0.22, z + 0.02, C.black);
+    B.box(x0 + 0.1, y0 + 0.1, 0.23, x1 - 0.1, y1 - 0.2, 0.5, C.black);   // printer / PC
+    if (o.height > 1.3) return;
+  }
+
+  function pillar(B, o) {
+    B.box(o.x, o.y, 0, o.x + o.w, o.y + o.h, o.height, C.white);
+    const fx = o.x + o.w * 0.65, fy = o.y + o.h;
+    B.box(fx - 0.15, fy, 0.9, fx + 0.15, fy + 0.12, 1.5, C.red);
+  }
+
+  function bin(B, o) {
+    const z = o.z || 0, H = o.height || 0.2, t = 0.015;
+    B.box(o.x, o.y, z, o.x + o.w, o.y + o.h, z + t, C.bin);
+    B.box(o.x, o.y, z, o.x + t, o.y + o.h, z + H, C.bin); B.box(o.x + o.w - t, o.y, z, o.x + o.w, o.y + o.h, z + H, C.bin);
+    B.box(o.x, o.y, z, o.x + o.w, o.y + t, z + H, C.bin); B.box(o.x, o.y + o.h - t, z, o.x + o.w, o.y + o.h, z + H, C.bin);
+    B.box(o.x + 0.04, o.y + 0.04, z + t, o.x + o.w - 0.04, o.y + o.h - 0.04, z + H * 0.75, C.paper);
+  }
+
+  function worker(B, w) {
+    const COAT = w.color ? hex(w.color) : C.coat;   // ErgoTwin: colour = exposure level of the station (aggregated)
+    if (w.color) B.cyl(w.x, w.y, 0.004, 0.02, 0.42, hex(w.color, 1), 20);
+    const f = (w.facing == null ? 90 : w.facing) * Math.PI / 180, fx = Math.cos(f), fy = Math.sin(f);
+    const sx = -fy, sy = fx, x = w.x, y = w.y, yaw = w.facing == null ? 90 : w.facing;
+    if (w.pose === "sitting") {
+      B.cyl(x - fx * 0.05, y - fy * 0.05, 0, 0.62, 0.035, C.stool, 8);
+      B.cyl(x - fx * 0.05, y - fy * 0.05, 0.6, 0.66, 0.18, C.stool, 12);
+      for (const s of [-1, 1]) {
+        B.obox(x + fx * 0.18 + sx * s * 0.1, y + fy * 0.18 + sy * s * 0.1, 0.7, 0.22, 0.07, 0.07, yaw, 0, C.pants);
+        B.cyl(x + fx * 0.38 + sx * s * 0.1, y + fy * 0.38 + sy * s * 0.1, 0.05, 0.68, 0.055, C.pants, 8);
+        B.obox(x + fx * 0.3 + sx * s * 0.17, y + fy * 0.3 + sy * s * 0.17, 0.98, 0.2, 0.05, 0.05, yaw, 15, COAT);
+      }
+      B.cyl(x + fx * 0.03, y + fy * 0.03, 0.66, 1.2, 0.17, COAT, 12);
+      B.sphere(x + fx * 0.1, y + fy * 0.1, 1.32, 0.105, C.skin);
+      B.sphere(x + fx * 0.07, y + fy * 0.07, 1.36, 0.1, C.hair);
+    } else {
+      for (const s of [-1, 1]) B.cyl(x + sx * s * 0.08, y + sy * s * 0.08, 0, 0.85, 0.065, C.pants, 8);
+      B.cyl(x, y, 0.8, 1.48, 0.19, COAT, 12);
+      for (const s of [-1, 1]) B.cyl(x + sx * s * 0.23, y + sy * s * 0.23, 0.85, 1.42, 0.05, COAT, 8);
+      B.sphere(x, y, 1.6, 0.11, C.skin);
+      B.sphere(x - fx * 0.02, y - fy * 0.02, 1.64, 0.105, C.hair);
+    }
+  }
+
+  function cart(B, o, mesh) {
+    cage(B, { x: o.x, y: o.y, w: o.w, h: o.h, height: o.height || 1.1 }, mesh);
+  }
+
+  function cameraModel(B, cam, floor, frustumGroup) {
+    const yaw = cam.yaw || 0, pitch = cam.pitch == null ? 35 : cam.pitch, h = cam.height || 2.5;
+    B.obox(cam.x, cam.y, h, 0.17, 0.08, 0.08, yaw, pitch, C.cam);
+    const fy = Math.cos(yaw * Math.PI / 180), fx = Math.sin(yaw * Math.PI / 180);
+    B.obox(cam.x + fy * 0.18, cam.y + fx * 0.18, h - 0.05, 0.03, 0.05, 0.05, yaw, pitch, C.black);
+    // bracket up to the ceiling / wall
+    const top = Math.min(floor.room_height || h + 0.6, h + 0.6);
+    B.box(cam.x - 0.025, cam.y - 0.025, h + 0.06, cam.x + 0.025, cam.y + 0.025, top, C.cam);
+    return frustumCorners(cam, floor);
+  }
+
+  function frustumCorners(cam, room) {
+    const yaw = (cam.yaw || 0) * Math.PI / 180, pitch = (cam.pitch == null ? 35 : cam.pitch) * Math.PI / 180;
+    const hf = (cam.fov || 70) * Math.PI / 360;
+    const vf = (cam.vfov != null ? cam.vfov : 2 * Math.atan(Math.tan(hf) * 9 / 16) * 180 / Math.PI) * Math.PI / 360;
+    const f = [Math.cos(yaw) * Math.cos(pitch), Math.sin(yaw) * Math.cos(pitch), -Math.sin(pitch)];
+    const r = [-Math.sin(yaw), Math.cos(yaw), 0];
+    const u = [Math.cos(yaw) * Math.sin(pitch), Math.sin(yaw) * Math.sin(pitch), Math.cos(pitch)];
+    const h = cam.height || 2.5, R = cam.range || 10, out = [];
+    for (const [a, b] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+      const d = [0, 1, 2].map(i => f[i] + r[i] * Math.tan(hf) * a + u[i] * Math.tan(vf) * b);
+      const n = Math.hypot(d[0], d[1], d[2]);
+      let t = R / n;                                   // clip at range
+      if (d[2] < 0) t = Math.min(t, h / -d[2]);        // hit the floor
+      if (room) {                                       // stop at the walls / ceiling
+        if (d[0] < 0) t = Math.min(t, (0 - cam.x) / d[0]); if (d[0] > 0) t = Math.min(t, (room.width - cam.x) / d[0]);
+        if (d[1] < 0) t = Math.min(t, (0 - cam.y) / d[1]); if (d[1] > 0) t = Math.min(t, (room.height - cam.y) / d[1]);
+        if (d[2] > 0 && room.room_height) t = Math.min(t, (room.room_height - h) / d[2]);
+      }
+      out.push([cam.x + d[0] * t, cam.y + d[1] * t, h + d[2] * t]);
+    }
+    return out;
+  }
+
+  // ------------------------------------------------------------------ scene
+  function buildScene(floor, opts) {
+    opts = opts || {};
+    const B = new Builder(), W = floor.width, H = floor.height, RH = floor.room_height || 4;
+    // floor + markings
+    B.group("Sol", { layer: "model" });
+    B.box(0, 0, -0.05, W, H, 0, C.floor);
+    for (const m of floor.markings || []) {
+      const col = m.color ? hex(m.color) : C.yellow, wd = (m.width || 0.08) / 2;
+      for (let i = 1; i < m.points.length; i++) {
+        const [a, b] = [m.points[i - 1], m.points[i]];
+        const L = Math.hypot(b[0] - a[0], b[1] - a[1]), yaw = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
+        B.obox((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, 0.003, L / 2, wd, 0.003, yaw, 0, col);
+      }
+    }
+    // walls: skirting (opaque) + translucent panels
+    B.group("Plinthes", { layer: "walls" });
+    B.box(-0.1, -0.1, 0, W + 0.1, 0, 0.12, C.wallBase);
+    B.box(-0.1, 0, 0, 0, H, 0.12, C.wallBase);
+    B.box(W, 0, 0, W + 0.1, H, 0.12, C.wallBase);
+    B.group("Murs", { layer: "walls", transparent: true });
+    B.box(-0.1, -0.1, 0.12, W + 0.1, 0, RH, C.wall);
+    B.box(-0.1, 0, 0.12, 0, H, RH, C.wall);
+    B.box(W, 0, 0.12, W + 0.1, H, RH, C.wall);
+    // obstacles
+    const mesh = [];
+    for (const o of floor.obstacles || []) {
+      B.group(o.label || o.id, { layer: "model" });
+      if (o.type === "table") table(B, o);
+      else if (o.type === "rack" || o.type === "stack") rack(B, o);
+      else if (o.type === "cage") cage(B, o, mesh);
+      else if (o.type === "crate") crate(B, o);
+      else if (o.type === "desk") desk(B, o);
+      else if (o.type === "pillar" || o.type === "wall") pillar(B, o);
+      else B.box(o.x, o.y, 0, o.x + o.w, o.y + o.h, o.height || 1, C.steelDark);
+      B.label(o.label || o.id, o.x + o.w / 2, o.y + o.h / 2, Math.min(o.height || 1, 3.4) + 0.25);
+    }
+    // props (decor, ignored by coverage)
+    B.group("Objets", { layer: "model" });
+    for (const pr of floor.props || []) {
+      if (pr.type === "bin") bin(B, pr);
+      else if (pr.type === "cart") cart(B, pr, mesh);
+      else if (pr.type === "box") B.obox(pr.x + pr.w / 2, pr.y + pr.h / 2, (pr.z || 0) + (pr.height || 0.1) / 2, pr.w / 2, pr.h / 2, (pr.height || 0.1) / 2, pr.yaw || 0, pr.pitch || 0, hex(pr.color || "#8d949b"));
+    }
+    B.group("Opérateurs", { layer: "workers" });
+    for (const pr of floor.props || []) if (pr.type === "worker") worker(B, pr);
+    if (mesh.length) {
+      B.group("Grillage", { layer: "model", transparent: true });
+      for (const [x0, y0, x1, y1, Hh] of mesh) {
+        B.box(x0, y0 - 0.004, 0.1, x1, y0 + 0.004, Hh, C.cageMesh); B.box(x0, y1 - 0.004, 0.1, x1, y1 + 0.004, Hh, C.cageMesh);
+        B.box(x0 - 0.004, y0, 0.1, x0 + 0.004, y1, Hh, C.cageMesh); B.box(x1 - 0.004, y0, 0.1, x1 + 0.004, y1, Hh, C.cageMesh);
+      }
+    }
+    // cameras + frustums
+    const cams = (floor.cameras || []).concat(opts.extraCameras || []);
+    const corners = [];
+    for (const cam of cams) {
+      B.group(cam.label || cam.id, { layer: "cameras", camId: cam.id });
+      corners.push([cam, cameraModel(B, cam, floor)]);
+      B.label(cam.label || cam.id, cam.x, cam.y, (cam.height || 2.5) + 0.45, "camera");
+    }
+    B.group("Champs caméra", { kind: "lines", layer: "frustum" });
+    for (const [cam, cs] of corners) {
+      const col = cam.suggested ? hex("#4ade80") : C.frustum, top = [cam.x, cam.y, cam.height || 2.5];
+      for (let i = 0; i < 4; i++) { B.line(top, cs[i], col); B.line(cs[i], cs[(i + 1) % 4], col); }
+    }
+    // 1 m grid + zones (lines)
+    B.group("Grille", { kind: "lines", layer: "grid" });
+    for (let x = 1; x < W; x++) B.line([x, 0, 0.004], [x, H, 0.004], C.grid);
+    for (let y = 1; y < H; y++) B.line([0, y, 0.004], [W, y, 0.004], C.grid);
+    B.group("Zones", { kind: "lines", layer: "zones" });
+    for (const z of floor.zones || []) {
+      const p = [[z.x, z.y], [z.x + z.w, z.y], [z.x + z.w, z.y + z.h], [z.x, z.y + z.h]];
+      for (let i = 0; i < 4; i++) B.line([p[i][0], p[i][1], 0.008], [p[(i + 1) % 4][0], p[(i + 1) % 4][1], 0.008], C.zone);
+      B.label(z.label, z.x + z.w / 2, z.y + z.h / 2, 0.05, "zone");
+    }
+    // coverage overlay (optional): count = Uint8Array rows*cols from coverage.js
+    if (opts.coverage) {
+      const { grid: g, count } = opts.coverage;
+      B.group("Couverture", { layer: "coverage", transparent: true });
+      const cb = hex("#ef4444", 0.42), c1 = hex("#f59e0b", 0.32), c2 = hex("#22c55e", 0.32);
+      for (let r = 0; r < g.rows; r++) for (let c = 0; c < g.cols; c++) {
+        const i = r * g.cols + c;
+        if (!g.walkable[i]) continue;
+        const n = count[i], col = n === 0 ? cb : n === 1 ? c1 : c2, s = g.cell, z = 0.012;
+        const x0 = c * s, y0 = r * s;
+        B.quad([x0, y0, z], [x0 + s, y0, z], [x0 + s, y0 + s, z], [x0, y0 + s, z], [0, 0, 1], col);
+      }
+    }
+    const groups = B.groups.filter(g => g.p.length).map(g => ({
+      name: g.name, kind: g.kind, transparent: g.transparent, layer: g.layer, camId: g.camId,
+      positions: new Float32Array(g.p), normals: new Float32Array(g.n), colors: new Float32Array(g.c),
+    }));
+    return { groups, labels: B.labels, bounds: { width: W, depth: H, height: RH } };
+  }
+
+  // ------------------------------------------------------------------ export: GLB (glTF 2.0 binary) and OBJ
+  function toGLB(scene, opts) {
+    opts = opts || {};
+    const groups = scene.groups.filter(g => opts.layers ? opts.layers.includes(g.layer) : g.layer !== "grid" && g.layer !== "zones");
+    const bufs = [], bufferViews = [], accessors = [], meshes = [], nodes = [];
+    let offset = 0;
+    function add(arr, comps, target) {
+      const bytes = new Uint8Array(arr.buffer, arr.byteOffset, arr.byteLength);
+      const pad = (4 - (bytes.length % 4)) % 4;
+      bufs.push(bytes); if (pad) bufs.push(new Uint8Array(pad));
+      bufferViews.push({ buffer: 0, byteOffset: offset, byteLength: bytes.length, target });
+      offset += bytes.length + pad;
+      const count = arr.length / comps, acc = { bufferView: bufferViews.length - 1, componentType: 5126, count,
+                                                 type: comps === 3 ? "VEC3" : "VEC4" };
+      if (comps === 3) {
+        const mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity];
+        for (let i = 0; i < arr.length; i += 3) for (let k = 0; k < 3; k++) { mn[k] = Math.min(mn[k], arr[i + k]); mx[k] = Math.max(mx[k], arr[i + k]); }
+        acc.min = mn; acc.max = mx;
+      }
+      accessors.push(acc); return accessors.length - 1;
+    }
+    for (const g of groups) {
+      const attributes = { POSITION: add(g.positions, 3, 34962), COLOR_0: add(g.colors, 4, 34962) };
+      if (g.kind !== "lines") attributes.NORMAL = add(g.normals, 3, 34962);
+      meshes.push({ name: g.name, primitives: [{ attributes, mode: g.kind === "lines" ? 1 : 4, material: g.transparent ? 1 : 0 }] });
+      nodes.push({ name: g.name, mesh: meshes.length - 1 });
+    }
+    const gltf = {
+      asset: { version: "2.0", generator: "ErgoTwin Eyes scene3d.js" },
+      scene: 0, scenes: [{ name: scene.name || "Atelier", nodes: nodes.map((_, i) => i) }], nodes, meshes,
+      materials: [
+        { name: "opaque", pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0, roughnessFactor: 0.85 }, doubleSided: true },
+        { name: "translucent", pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0, roughnessFactor: 0.9 }, doubleSided: true, alphaMode: "BLEND" },
+      ],
+      accessors, bufferViews, buffers: [{ byteLength: offset }],
+    };
+    let json = new TextEncoder().encode(JSON.stringify(gltf));
+    const jpad = (4 - (json.length % 4)) % 4;
+    const jsonChunk = new Uint8Array(json.length + jpad); jsonChunk.set(json); jsonChunk.fill(0x20, json.length);
+    const total = 12 + 8 + jsonChunk.length + 8 + offset;
+    const out = new Uint8Array(total), dv = new DataView(out.buffer);
+    dv.setUint32(0, 0x46546C67, true); dv.setUint32(4, 2, true); dv.setUint32(8, total, true);
+    dv.setUint32(12, jsonChunk.length, true); dv.setUint32(16, 0x4E4F534A, true); out.set(jsonChunk, 20);
+    let o = 20 + jsonChunk.length;
+    dv.setUint32(o, offset, true); dv.setUint32(o + 4, 0x004E4942, true); o += 8;
+    for (const b of bufs) { out.set(b, o); o += b.length; }
+    return out;
+  }
+
+  function toOBJ(scene, opts) {
+    opts = opts || {};
+    const lines = ["# ErgoTwin Eyes - floor model (meters, Y up). Vertex colours: v x y z r g b"];
+    let base = 1;
+    for (const g of scene.groups) {
+      if (opts.layers ? !opts.layers.includes(g.layer) : (g.layer === "grid" || g.layer === "zones")) continue;
+      lines.push(`o ${g.name.replace(/\s+/g, "_")}`);
+      const P = g.positions, Cc = g.colors, n = P.length / 3;
+      for (let i = 0; i < n; i++) lines.push(`v ${P[3 * i].toFixed(4)} ${P[3 * i + 1].toFixed(4)} ${P[3 * i + 2].toFixed(4)} ${Cc[4 * i].toFixed(3)} ${Cc[4 * i + 1].toFixed(3)} ${Cc[4 * i + 2].toFixed(3)}`);
+      if (g.kind === "lines") for (let i = 0; i < n; i += 2) lines.push(`l ${base + i} ${base + i + 1}`);
+      else for (let i = 0; i < n; i += 3) lines.push(`f ${base + i} ${base + i + 1} ${base + i + 2}`);
+      base += n;
+    }
+    return lines.join("\n") + "\n";
+  }
+
+  const api = { buildScene, toGLB, toOBJ, frustumCorners, colors: C };
+  global.Scene3D = api;
+  if (typeof module !== "undefined") module.exports = api;
+})(typeof window !== "undefined" ? window : globalThis);
+
+// ErgoTwin Lancement — moteur ergonomique (simulation du pipeline vision + scores normalisés).
+// En production, les angles viennent du serveur edge (MediaPipe sur flux RTSP, en mémoire vive).
+// Ici, un modèle de tâche génère des angles plausibles pour chaque poste en fonction de l'aménagement.
+(function (G) {
+  "use strict";
+
+  // ------------------------------------------------------------------ référentiel du poste
+  const STATIONS = [
+    { id: "P01", task: "tri", label: "Tri des panneaux par taille", seat: 0 },
+    { id: "P02", task: "controle", label: "Contrôle 1 pièce / paquet", seat: 1 },
+    { id: "P03", task: "controle", label: "Contrôle 1 pièce / paquet", seat: 2 },
+    { id: "P04", task: "etiquetage", label: "Étiquetage des pièces conformes", seat: 3 },
+    { id: "P05", task: "etiquetage", label: "Étiquetage des pièces conformes", seat: 4 },
+  ];
+  const TASKS = {
+    tri: { name: "Tri", icon: "▦", main: ["epaule", "tronc"] },
+    controle: { name: "Contrôle", icon: "◉", main: ["poignet", "coude", "cou"] },
+    etiquetage: { name: "Étiquetage", icon: "▭", main: ["poignet", "epaule"] },
+  };
+  // Pseudonymes : le nom réel n'est visible que dans l'espace médecin (D1).
+  const WORKERS = [
+    { pid: "OP-7F3A", slot: 1, nom: "M.C.", anc: 28, hist: "De Quervain D, sus-épineux D, épicondylite bilat." },
+    { pid: "OP-21C9", slot: 2, nom: "R.H.", anc: 6, hist: "—" },
+    { pid: "OP-B04E", slot: 3, nom: "S.T.", anc: 11, hist: "Épicondylite G (2024)" },
+    { pid: "OP-5D18", slot: 4, nom: "N.B.", anc: 3, hist: "—" },
+    { pid: "OP-9A62", slot: 5, nom: "A.K.", anc: 15, hist: "Canal carpien D opéré (2021)" },
+  ];
+  const ZONES = {
+    poignet: { n: "Poignet · main", ar: "المعصم" },
+    coude: { n: "Coude", ar: "الكوع" },
+    epaule: { n: "Épaule", ar: "الكتف" },
+    cou: { n: "Cou", ar: "الرقبة" },
+    tronc: { n: "Dos (tronc)", ar: "الظهر" },
+  };
+  const ZK = ["poignet", "coude", "epaule", "cou", "tronc"];
+
+  // Seuils d'exposition journalière (minutes) au-delà desquels l'indice atteint 50.
+  // Sources : tableau des MP (critères d'exposition repris dans le prototype médecin), ISO 11226, workshop TMS (Descatha 2025).
+  const THR = {
+    poignet: 60,   // déviation > 15° (RULA) avec ≥ 10 gestes/min ≥ 1 h/j (tendinites / De Quervain)
+    coude: 60,     // prono-supination ≥ 10 mvts/min ≥ 1 h/j (épicondylite)
+    epaule: 120,   // bras ≥ 60° ≥ 2 h/j (tendinopathie chronique de la coiffe)
+    epaule90: 60,  // bras ≥ 90° ≥ 1 h/j
+    cou: 120,      // flexion > 25° maintenue (ISO 11226, indicatif)
+    tronc: 120,    // flexion > 20° (ISO 11226, indicatif)
+  };
+
+  const BASE_LAYOUT = { tableH: 90, binDist: 65, pupitre: false, dispenser: false, rotationMin: 270, microPause: 0 };
+  const DAY = { start: 7.5 * 60, end: 17 * 60, lunch: [12.5 * 60, 13 * 60] }; // TLS : 7h30–17h00, 30 min de pause
+  const PACKETS_TARGET = 12000;   // paquets / jour / équipe (cahier des charges)
+
+  // ------------------------------------------------------------------ PRNG déterministe
+  function rng(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  // ------------------------------------------------------------------ modèle de tâche → angles
+  // t : secondes, ph : phase. Retourne les angles (°) et fréquences observables par la vision.
+  function cycleSec(task, L) {
+    let c = 5.4;                                            // 12 000 paquets / 2 opératrices / 9 h = 5,4 s
+    if (task === "etiquetage" && L.dispenser) c *= 0.92;    // le distributeur présente l'étiquette décollée
+    if (task === "controle" && L.pupitre) c *= 0.95;        // plus besoin de retourner la pièce
+    if (task === "tri") c *= 1 - clamp((65 - L.binDist) / 5, 0, 6) * 0.01;
+    return c;
+  }
+  function sample(task, L, t, R) {
+    const c = cycleSec(task, L), w = Math.sin(2 * Math.PI * t / c), n = () => (R() - 0.5) * 2;
+    const hiT = Math.max(0, L.tableH - 92), loT = Math.max(0, 88 - L.tableH);
+    let a = {};
+    if (task === "tri") {
+      a.shoulder = 25 + Math.max(0, L.binDist - 40) * 1.4 + 15 * w + 5 * n() + hiT * 1.2;
+      a.trunk = 6 + Math.max(0, L.binDist - 45) * 0.8 + 6 * Math.max(0, w) + 3 * n() + loT * 0.8;
+      a.wrist = 10 + 6 * Math.abs(w) + 3 * n();
+      a.elbowRate = 8 + 2 * n(); a.neck = 14 + loT * 1.2 + 4 * n(); a.pinch = 0; a.actions = 3.5;
+    } else if (task === "controle") {
+      a.wrist = 20 - (L.pupitre ? 9 : 0) + 8 * w + 4 * n();
+      a.elbowRate = (L.pupitre ? 9 : 22) + 3 * n();        // pupitre + miroir : plus besoin de retourner la pièce
+      a.shoulder = 28 + hiT * 1.5 + 10 * Math.abs(w) + 4 * n();
+      a.neck = 32 - (L.pupitre ? 15 : 0) + loT * 1.2 + 5 * n();
+      a.trunk = 8 + loT * 0.6 + 3 * n(); a.pinch = 0; a.actions = L.pupitre ? 3 : 4;
+    } else {
+      a.wrist = 24 - (L.dispenser ? 14 : 0) + 7 * w + 4 * n();
+      a.pinch = L.dispenser ? 0 : 60 / c;                         // une pince pouce-index par étiquette
+      a.elbowRate = (L.dispenser ? 7 : 12) + 2 * n();
+      a.shoulder = 42 - (L.dispenser ? 12 : 0) + hiT * 1.5 + 14 * w + 5 * n();
+      a.neck = (L.dispenser ? 16 : 22) + loT * 1.2 + 4 * n(); a.trunk = 7 + loT * 0.6 + 3 * n(); a.actions = L.dispenser ? 2.5 : 4;
+    }
+    a.wrist = Math.abs(a.wrist); a.actionsPerMin = a.actions * 60 / c;
+    return a;
+  }
+
+  // ------------------------------------------------------------------ RULA (McAtamney & Corlett, 1993)
+  const RULA_A = [ // [upperArm 1-6][lowerArm 1-3][wrist 1-4 × twist 1-2]
+    [[1,2,2,2,2,3,3,3],[2,2,2,2,3,3,3,3],[2,3,3,3,3,3,4,4]],
+    [[2,3,3,3,3,4,4,4],[3,3,3,3,3,4,4,4],[3,4,4,4,4,4,5,5]],
+    [[3,3,4,4,4,4,5,5],[3,4,4,4,4,4,5,5],[4,4,4,4,4,5,5,5]],
+    [[4,4,4,4,4,5,5,5],[4,4,4,4,4,5,5,5],[4,4,4,5,5,5,6,6]],
+    [[5,5,5,5,5,6,6,7],[5,6,6,6,6,7,7,7],[6,6,6,7,7,7,7,8]],
+    [[7,7,7,7,7,8,8,9],[8,8,8,8,8,9,9,9],[9,9,9,9,9,9,9,9]]];
+  const RULA_B = [ // [neck 1-6][trunk 1-6 × legs 1-2]
+    [1,3,2,3,3,4,5,5,6,6,7,7],[2,3,2,3,4,5,5,5,6,7,7,7],[3,3,3,4,4,5,5,6,6,7,7,7],
+    [5,5,5,6,6,7,7,7,7,7,8,8],[7,7,7,7,7,8,8,8,8,8,8,8],[8,8,8,8,8,8,8,9,9,9,9,9]];
+  const RULA_C = [[1,2,3,3,4,5,5],[2,2,3,4,4,5,5],[3,3,3,4,4,5,6],[3,3,3,4,5,6,6],
+    [4,4,4,5,6,7,7],[4,4,5,6,6,7,7],[5,5,6,6,7,7,7],[5,5,6,7,7,7,7]];
+  function rula(a) {
+    let ua = a.shoulder < 20 ? 1 : a.shoulder < 45 ? 2 : a.shoulder < 90 ? 3 : 4;
+    if (a.shoulder > 30) ua += 1;                           // bras en abduction pendant l'atteinte
+    ua = clamp(ua, 1, 6);
+    const la = 2;                                           // avant-bras hors 60–100° pendant le geste
+    let wr = a.wrist < 5 ? 1 : a.wrist <= 15 ? 2 : 3;
+    if (a.wrist > 15) wr += 1;                              // déviation ulnaire / radiale
+    wr = clamp(wr, 1, 4);
+    const tw = a.elbowRate > 10 ? 2 : 1;                    // prono-supination en fin d'amplitude
+    const muscle = a.actionsPerMin > 4 ? 1 : 0;             // geste répété > 4 fois/min
+    const scoreC = clamp(RULA_A[ua - 1][la - 1][(wr - 1) * 2 + (tw - 1)] + muscle, 1, 8);
+    let nk = a.neck < 10 ? 1 : a.neck < 20 ? 2 : 3;
+    let tr = a.trunk < 5 ? 1 : a.trunk < 20 ? 2 : a.trunk < 60 ? 3 : 4;
+    const scoreD = clamp(RULA_B[nk - 1][(tr - 1) * 2] + muscle, 1, 7);
+    const g = RULA_C[clamp(scoreC, 1, 8) - 1][clamp(scoreD, 1, 7) - 1];
+    return { score: g, level: g <= 2 ? 1 : g <= 4 ? 2 : g <= 6 ? 3 : 4 };
+  }
+  const RULA_TXT = { 1: "Acceptable", 2: "À approfondir", 3: "À changer bientôt", 4: "À changer immédiatement" };
+
+  // ------------------------------------------------------------------ accumulation d'exposition (dt en s)
+  function emptyExpo() { return { poignet: 0, coude: 0, epaule: 0, epaule90: 0, cou: 0, tronc: 0, pinch: 0, actions: 0, sec: 0, rulaSum: 0, rulaHi: 0, n: 0 }; }
+  // Minutes « équivalentes » : chaque minute est pondérée par la sévérité de la posture et la fréquence du geste
+  // (bandes larges : une petite erreur d'angle de la caméra change peu le résultat).
+  function accumulate(E, a, dt) {
+    const m = dt / 60, f = clamp(a.actionsPerMin / 30, 0, 1.5);           // 30 actions/min = fréquence de référence OCRA
+    E.poignet += m * clamp((a.wrist - 15) / 20, 0, 1) * f;                  // au-delà de 15° (seuil RULA)
+    E.coude += m * clamp((a.elbowRate - 8) / 14, 0, 1.2);                   // ≈ 10 mvts/min et plus
+    E.epaule += m * clamp((a.shoulder - 45) / 15, 0, 1);                     // pleine pondération à partir de 60°
+    E.epaule90 += a.shoulder >= 90 ? m : 0;
+    E.cou += m * clamp((a.neck - 15) / 20, 0, 1);                           // pleine pondération au-delà de 35°
+    E.tronc += m * clamp((a.trunk - 10) / 20, 0, 1);
+    E.pinch += a.pinch * m; E.actions += a.actionsPerMin * m; E.sec += dt;
+    const r = rula(a); E.rulaSum += r.score; E.n++; if (r.score >= 5) E.rulaHi += dt;
+  }
+  function recovery(pauseMinPerH) { return 1.15 - 0.15 * Math.min(pauseMinPerH / 10, 1); }
+  // indice 0–100 : 50 quand l'exposition atteint le seuil journalier, 75 à deux fois le seuil
+  const sat = r => 100 * (1 - Math.pow(2, -r));
+  function zoneIndex(E, pause) {
+    const f = recovery(pause || 0), out = {};
+    out.poignet = sat(E.poignet / THR.poignet + E.pinch / 6000);           // 6 000 pinces/j ≈ +1 seuil (De Quervain)
+    out.coude = sat(E.coude / THR.coude);
+    out.epaule = sat(Math.max(E.epaule / THR.epaule, E.epaule90 / THR.epaule90));
+    out.cou = sat(E.cou / THR.cou);
+    out.tronc = sat(E.tronc / THR.tronc);
+    for (const k of ZK) out[k] = Math.round(clamp(out[k] * f, 0, 100));
+    return out;
+  }
+  const level = v => (v >= 65 ? "R" : v >= 40 ? "O" : "G");
+  const LV = { R: "Élevée", O: "À surveiller", G: "Faible" };
+  const COL = { R: "#E5484D", O: "#F5A524", G: "#2FB56F", X: "#9AA4AE" };
+
+  // ------------------------------------------------------------------ simulation d'une journée (prévision What-If)
+  // schedule : tableau des tâches par opératrice et par tranche ; renvoie l'indice par opératrice et par poste
+  function rotationPlan(L) {
+    const blocks = [], work = [[DAY.start, DAY.lunch[0]], [DAY.lunch[1], DAY.end]];
+    const len = L.rotationMin || 270;
+    for (const [a, b] of work) for (let t = a; t < b; t += len) blocks.push([t, Math.min(b, t + len)]);
+    // ordre « anti-transfert » : alterner une tâche poignet-coude (contrôle) et une tâche épaule (tri) / mixte (étiquetage)
+    const order = ["P02", "P01", "P04", "P03", "P05"];
+    return blocks.map((bk, i) => ({ t0: bk[0], t1: bk[1], seat: WORKERS.map((w, k) => order[(k + i) % 5]) }));
+  }
+  function simulateDay(L, opts) {
+    opts = opts || {}; const R = rng(opts.seed || 7), dt = opts.dt || 30;
+    const plan = rotationPlan(L), perW = WORKERS.map(() => emptyExpo()), perS = {};
+    STATIONS.forEach(s => (perS[s.id] = emptyExpo()));
+    for (const b of plan) for (let t = b.t0 * 60; t < b.t1 * 60; t += dt) {
+      WORKERS.forEach((w, k) => {
+        const st = STATIONS.find(s => s.id === b.seat[k]), a = sample(st.task, L, t, R);
+        accumulate(perW[k], a, dt); accumulate(perS[st.id], a, dt);
+      });
+    }
+    const wIdx = perW.map(E => zoneIndex(E, L.microPause));
+    const sIdx = {}; for (const s of STATIONS) sIdx[s.id] = { idx: zoneIndex(perS[s.id], L.microPause), E: perS[s.id], rula: Math.round(perS[s.id].rulaSum / Math.max(1, perS[s.id].n) * 10) / 10, hi: perS[s.id].rulaHi / Math.max(1, perS[s.id].sec) };
+    return { wIdx, sIdx, perW, cadence: cadence(L) };
+  }
+  function cadence(L) {
+    // capacité de chaque tâche (2 opératrices au contrôle, 2 à l'étiquetage, 1 au tri) sur 9 h moins micro-pauses
+    const avail = 9 * 3600 * (1 - (L.microPause || 0) / 60);
+    const cap = { controle: 2 * avail / cycleSec("controle", L), etiquetage: 2 * avail / cycleSec("etiquetage", L), tri: 1 * avail / (cycleSec("tri", L) / 2) };
+    const out = Math.round(Math.min(cap.controle, cap.etiquetage, cap.tri));
+    return { packets: out, ok: out >= PACKETS_TARGET * 0.995, cap };
+  }
+
+  // ------------------------------------------------------------------ règles de recommandation (table ErgoTwin §4)
+  function recommend(L, base) {
+    const R = [], S = base.sIdx;
+    const avg = (ids, z) => ids.reduce((t, id) => t + S[id].idx[z], 0) / ids.length;
+    if (L.binDist > 45 && (S.P01.idx.epaule >= 40 || S.P01.idx.tronc >= 40))
+      R.push({ id: "bins", st: ["P01"], titre: "Rapprocher les bacs de tri dans la zone d'atteinte normale (≤ 40 cm), classés par fréquence d'usage",
+        probleme: "Bras tendu loin du corps et tronc penché pour atteindre les bacs", norme: "ISO 14738 · ISO 11226 · RULA", methode: "5S · Lean (muda déplacement)",
+        change: { binDist: 40 }, cout: 150, effort: "Faible", essai: "2 semaines avec bacs déplacés provisoirement" });
+    if (!L.dispenser && avg(["P04", "P05"], "poignet") >= 40)
+      R.push({ id: "disp", st: ["P04", "P05"], titre: "Distributeur d'étiquettes à décollement automatique : l'étiquette est présentée décollée, plus de pince pouce-index",
+        probleme: "Pince pouce-index répétée toutes les 5 s + déviation du poignet (De Quervain)", norme: "ISO 11228-3 · OCRA · RULA", methode: "Kaizen",
+        change: { dispenser: true }, cout: 900, effort: "Moyen", essai: "1 distributeur prêté par le fournisseur sur P04 pendant 2 semaines, P05 = comparaison" });
+    if (!L.pupitre && (avg(["P02", "P03"], "coude") >= 40 || avg(["P02", "P03"], "cou") >= 40))
+      R.push({ id: "pup", st: ["P02", "P03"], titre: "Pupitre de contrôle incliné à 15–20° : contrôler la pièce sans la retourner, regard moins baissé",
+        probleme: "Prono-supination répétée pour retourner la pièce + cou fléchi > 25°", norme: "EN 1005-4 · ISO 11226", methode: "Lean · 5S",
+        change: { pupitre: true }, cout: 500, effort: "Faible", essai: "Pupitre en contreplaqué fabriqué sur place, 2 semaines sur P02" });
+    if (L.rotationMin > 150)
+      R.push({ id: "rot", st: ["P01", "P02", "P03", "P04", "P05"], titre: "Rotation planifiée toutes les 2 h entre tâches qui sollicitent des zones différentes (ordre anti-transfert)",
+        probleme: "Cycle de 5,4 s (< 30 s) : répétitivité élevée sur la même zone pendant 4 h 30", norme: "ISO 11228-3 · OCRA", methode: "Kaizen · rotation",
+        change: { rotationMin: 120 }, cout: 0, effort: "Faible", essai: "Planning de rotation choisi avec les opératrices (atelier participatif, H4)" });
+    if ((L.microPause || 0) < 3)
+      R.push({ id: "pause", st: ["P01", "P02", "P03", "P04", "P05"], titre: "Micro-pauses de 3 min/h, au moment choisi par l'opératrice (bouton sur la tablette)",
+        probleme: "Temps de récupération insuffisant entre les cycles", norme: "ISO 11228-3 (facteur de récupération OCRA)", methode: "Kaizen",
+        change: { microPause: 3 }, cout: 0, effort: "Faible", essai: "4 semaines, suivi de la cadence pour vérifier qu'elle tient" });
+    if (L.tableH < 86 || L.tableH > 94)
+      R.push({ id: "table", st: ["P01", "P02", "P03", "P04", "P05"], titre: "Régler la hauteur du plan de travail à la hauteur du coude assis (≈ 90 cm avec tabouret de 66 cm)",
+        probleme: "Plan trop " + (L.tableH < 86 ? "bas : cou et dos fléchis" : "haut : épaules relevées"), norme: "ISO 14738 · ISO 7250-1", methode: "5S",
+        change: { tableH: 90 }, cout: 300, effort: "Faible", essai: "Cales réglables provisoires" });
+    return R;
+  }
+  // contrôle anti-transfert (M1) : une action est refusée si elle fait passer une zone d'une opératrice
+  // au niveau « à surveiller » ou plus (≥ 40) en l'augmentant de plus de 5 points
+  function transferCheck(before, after) {
+    const issues = [];
+    after.wIdx.forEach((z, k) => ZK.forEach(zk => { const d = z[zk] - before.wIdx[k][zk]; if (d > 5 && z[zk] >= 40) issues.push({ w: k, zone: zk, d, v: z[zk] }); }));
+    const delta = {}; ZK.forEach(zk => { delta[zk] = Math.round(avgArr(after.wIdx.map(z => z[zk])) - avgArr(before.wIdx.map(z => z[zk]))); });
+    return { ok: issues.length === 0, issues, delta };
+  }
+  const avgArr = a => a.reduce((t, v) => t + v, 0) / Math.max(1, a.length);
+
+  // ------------------------------------------------------------------ historique 30 jours (données de démonstration)
+  function history(days, seed) {
+    const R = rng(seed || 42), out = [];
+    for (let d = days; d >= 1; d--) {
+      const day = simulateDay(BASE_LAYOUT, { seed: 1000 + d, dt: 90 });
+      const sympt = WORKERS.map((w, k) => { const z = day.wIdx[k], o = {}; ZK.forEach(zk => { o[zk] = R() < (z[zk] / 100) * 0.55 + (w.hist !== "—" ? 0.08 : 0) ? 1 : 0; }); return o; });
+      const reports = Math.round(R() * 1.6);
+      out.push({ d, day, sympt, reports });
+    }
+    return out;
+  }
+
+  // ------------------------------------------------------------------ calcul économique (mêmes hypothèses que le PDF)
+  const ROI_DEFAULT = {
+    nOps: 5, salaireBrut: 750, charges: 0.175, joursAn: 312,
+    absJours: 60, coutJourFacteur: 1.5, departsAn: 1, coutDepart: 0.25, mpParAn: 1 / 3, coutMP: 3180,
+    reboursTaux: 0.002, coutRebours: 0.4, gainProd: 0.02,
+    reduc: 0.30, reducQual: 0.20,
+    capexPoste: 3994, capexPartage: 6650, postes: 4, opexPoste: 510, opexPartage: 600,
+  };
+  function roi(p) {
+    p = Object.assign({}, ROI_DEFAULT, p || {});
+    const annuel = p.salaireBrut * 12 * (1 + p.charges), jour = annuel / p.joursAn;
+    const g = {
+      absenteisme: p.absJours * jour * p.coutJourFacteur * p.reduc,
+      turnover: p.departsAn * (annuel * p.coutDepart + 0.3 * 24 * jour) * p.reduc,
+      productivite: p.gainProd * p.nOps * annuel,
+      qualite: PACKETS_TARGET * p.joursAn * p.reboursTaux * p.coutRebours * p.reducQual,
+      maladiesPro: p.mpParAn * p.coutMP * p.reduc,
+    };
+    const gainPoste = Object.values(g).reduce((a, b) => a + b, 0);
+    const netPoste = gainPoste - p.opexPoste;
+    const capexLigne = p.capexPartage + p.postes * p.capexPoste;
+    const netLigne = p.postes * gainPoste - p.postes * p.opexPoste - p.opexPartage;
+    return { annuel, jour, g, gainPoste, netPoste, paybackPoste: 12 * p.capexPoste / netPoste,
+      capexLigne, netLigne, paybackLigne: 12 * capexLigne / netLigne, roi3ans: (3 * netLigne - capexLigne) / capexLigne, p };
+  }
+
+  G.Engine = { STATIONS, TASKS, WORKERS, ZONES, ZK, THR, BASE_LAYOUT, DAY, PACKETS_TARGET, rng, sample, rula, RULA_TXT,
+    emptyExpo, accumulate, zoneIndex, level, LV, COL, simulateDay, rotationPlan, cadence, recommend, transferCheck, history,
+    cycleSec, roi, ROI_DEFAULT, clamp };
+})(typeof window !== "undefined" ? window : globalThis);
+
+// ErgoTwin Lancement — bus de messages (simulation MQTT), authentification, horloge et état partagé.
+(function (G) {
+  "use strict";
+  const E = G.Engine;
+
+  // ------------------------------------------------------------------ SHA-256 (empreinte des mots de passe, démo)
+  function sha256(ascii) {
+    const K = [], H = [], isP = n => { for (let f = 2; f * f <= n; f++) if (n % f === 0) return false; return true; };
+    for (let c = 2, i = 0; i < 64; c++) if (isP(c)) { if (i < 8) H[i] = (Math.pow(c, 1 / 2) * 2 ** 32) | 0; K[i++] = (Math.pow(c, 1 / 3) * 2 ** 32) | 0; }
+    const bytes = unescape(encodeURIComponent(ascii)), l = bytes.length * 8, w = [];
+    let m = bytes + "\x80"; while (m.length % 64 - 56) m += "\x00";
+    for (let i = 0; i < m.length; i++) w[i >> 2] |= m.charCodeAt(i) << ((3 - i) % 4) * 8;
+    w[w.length] = (l / 2 ** 32) | 0; w[w.length] = l | 0;
+    const r = (v, n) => (v >>> n) | (v << (32 - n));
+    for (let j = 0; j < w.length;) {
+      const W = w.slice(j, j += 16), old = H.slice(0);
+      for (let i = 0; i < 64; i++) {
+        const w15 = W[i - 15], w2 = W[i - 2], a = H[0], e = H[4];
+        const t1 = H[7] + (r(e, 6) ^ r(e, 11) ^ r(e, 25)) + ((e & H[5]) ^ (~e & H[6])) + K[i] +
+          (W[i] = i < 16 ? W[i] : (W[i - 16] + (r(w15, 7) ^ r(w15, 18) ^ (w15 >>> 3)) + W[i - 7] + (r(w2, 17) ^ r(w2, 19) ^ (w2 >>> 10))) | 0);
+        const t2 = (r(a, 2) ^ r(a, 13) ^ r(a, 22)) + ((a & H[1]) ^ (a & H[2]) ^ (H[1] & H[2]));
+        H.unshift((t1 + t2) | 0); H[4] = (H[4] + t1) | 0; H.pop();
+      }
+      for (let i = 0; i < 8; i++) H[i] = (H[i] + old[i]) | 0;
+    }
+    return H.map(v => (v >>> 0).toString(16).padStart(8, "0")).join("");
+  }
+
+  // ------------------------------------------------------------------ bus (topics façon MQTT)
+  const subs = [], LOG = [], COUNT = {};
+  let chan = null; try { chan = new BroadcastChannel("ergotwin-lancement"); } catch (e) { chan = null; }
+  function publish(topic, payload, meta) {
+    const msg = { topic, payload, ts: S.clock, from: (meta && meta.from) || "?", to: (meta && meta.to) || [], qos: (meta && meta.qos) || 1, priv: !!(meta && meta.priv) };
+    LOG.unshift(msg); if (LOG.length > 120) LOG.pop();
+    COUNT[msg.from] = (COUNT[msg.from] || 0) + 1; msg.to.forEach(t => (COUNT[t] = (COUNT[t] || 0) + 1));
+    for (const s of subs) if (match(s.pat, topic)) try { s.fn(payload, msg); } catch (err) { console.error(err); }
+    if (chan && !(meta && meta.local)) try { chan.postMessage({ topic, payload }); } catch (e) { /* onglet unique */ }
+    return msg;
+  }
+  function subscribe(pat, fn) { subs.push({ pat, fn }); }
+  function match(p, t) { const a = p.split("/"), b = t.split("/"); for (let i = 0; i < a.length; i++) { if (a[i] === "#") return true; if (a[i] !== "+" && a[i] !== b[i]) return false; } return a.length === b.length; }
+
+  // ------------------------------------------------------------------ authentification (rôles séparés, D1/D2)
+  const USERS = [{"u": "ingenieur", "role": "engineer", "salt": "740c3188d44cb981", "h": "4eb42f43635f6e2e7bec3feed375199104d77b7d5afe62f062d0e98c374fb5ea"}, {"u": "medecin", "role": "doctor", "salt": "50030e5d9f8030c1", "h": "8ed1ad0257577ead24f569b0f10de9042dc9c84353359d301861a92cc107cf6a"}];
+  const AUTH = { user: null, role: null, last: 0, fails: 0, lockUntil: 0 };
+  const ROLE_TXT = { engineer: "Ingénieur concepteur", doctor: "Médecin du travail" };
+  function login(u, p) {
+    const now = Date.now();
+    if (now < AUTH.lockUntil) return { ok: false, msg: "Trop d'essais. Réessayez dans " + Math.ceil((AUTH.lockUntil - now) / 1000) + " s." };
+    const rec = USERS.find(x => x.u === String(u).trim().toLowerCase());
+    if (rec && sha256(rec.salt + p) === rec.h) {
+      AUTH.user = rec.u; AUTH.role = rec.role; AUTH.last = now; AUTH.fails = 0;
+      publish("sys/auth", { user: rec.u, role: rec.role, event: "login" }, { from: "Dashboard", to: ["Serveur edge"] });
+      return { ok: true, role: rec.role };
+    }
+    AUTH.fails++; if (AUTH.fails >= 5) { AUTH.lockUntil = now + 60000; AUTH.fails = 0; }
+    publish("sys/auth", { user: String(u).slice(0, 20), event: "échec" }, { from: "Dashboard", to: ["Serveur edge"] });
+    return { ok: false, msg: "Identifiant ou mot de passe incorrect." };
+  }
+  function logout() { AUTH.user = AUTH.role = null; }
+  function can(role) { if (AUTH.role !== role) return false; if (Date.now() - AUTH.last > 15 * 60000) { logout(); return false; } AUTH.last = Date.now(); return true; }
+
+  // ------------------------------------------------------------------ état partagé
+  const S = {
+    clock: E.DAY.start - 5, speed: 60, running: true, layout: Object.assign({}, E.BASE_LAYOUT), preview: null,
+    assign: {}, paused: {}, out: {}, expoW: {}, expoS: {}, est: {}, live: {}, visible: {},
+    answers: [], reports: [], prefs: {}, kaizen: [], seed: E.rng(2026), cams: { close: true },
+  };
+  E.WORKERS.forEach(w => { S.expoW[w.pid] = E.emptyExpo(); S.prefs[w.pid] = { pause: "libre" }; });
+  E.STATIONS.forEach(s => { S.expoS[s.id] = E.emptyExpo(); S.est[s.id] = 0; S.visible[s.id] = 2; });
+  const byPid = pid => E.WORKERS.find(w => w.pid === pid);
+  const bySlot = slot => E.WORKERS.find(w => w.slot === slot);
+  const occupant = st => Object.keys(S.assign).find(p => S.assign[p] === st);
+  const hhmm = m => { m = Math.max(0, Math.round(m)); return String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0"); };
+
+  // pointage : un seul point d'entrée, utilisé par la tablette et par la simulation
+  function pointage(pid, action, station, src) {
+    const w = byPid(pid); if (!w) return;
+    publish("lancement/terminal/T01/fp", { slot: w.slot, match: true, score: 120 + Math.round(S.seed() * 80) }, { from: "ESP32 + R307", to: ["Serveur edge"], qos: 1 });
+    const old = S.assign[pid] || null;
+    if (action === "entree" || action === "changement") { const o = occupant(station); if (o && o !== pid) S.assign[o] = null; S.assign[pid] = station; S.out[pid] = false; S.paused[pid] = false; }
+    if (action === "pause") S.paused[pid] = true;
+    if (action === "reprise") S.paused[pid] = false;
+    if (action === "sortie") { S.assign[pid] = null; S.out[pid] = true; }
+    publish("lancement/pointage", { pid, action, station: station || old, ancien: old, src: src || "tablette" }, { from: "Serveur edge", to: ["Vision", "Tablette", "Jumeau 3D"] });
+  }
+
+  // ------------------------------------------------------------------ horloge de simulation
+  let acc = 0, lastPub = {};
+  function inWork(m) { return m >= E.DAY.start && m < E.DAY.end && !(m >= E.DAY.lunch[0] && m < E.DAY.lunch[1]); }
+  function step(simSec) {
+    const dt = 10; acc += simSec;
+    while (acc >= dt) {
+      acc -= dt; const prev = S.clock; S.clock += dt / 60;
+      // événements planifiés (simulés) : arrivée, rotation de l'après-midi
+      if (prev < E.DAY.start && S.clock >= E.DAY.start - 0.01) E.WORKERS.forEach((w, k) => { if (!S.out[w.pid] && !S.assign[w.pid]) pointage(w.pid, "entree", E.rotationPlan(S.layout)[0].seat[k], "simulation"); });
+      if (prev < E.DAY.lunch[1] && S.clock >= E.DAY.lunch[1]) {
+        const plan = E.rotationPlan(S.layout), b = plan.find(x => x.t0 >= E.DAY.lunch[1] - 0.01);
+        if (b) E.WORKERS.forEach((w, k) => { if (S.assign[w.pid]) pointage(w.pid, "changement", b.seat[k], "simulation"); });
+      }
+      if (!inWork(S.clock)) continue;
+      for (const st of E.STATIONS) {
+        const pid = occupant(st.id); if (!pid || S.paused[pid]) { S.live[st.id] = null; continue; }
+        const a = E.sample(st.task, S.layout, S.clock * 60, S.seed), est = S.visible[st.id] === 0;
+        E.accumulate(S.expoW[pid], a, dt); E.accumulate(S.expoS[st.id], a, dt); if (est) S.est[st.id] += dt;
+        S.live[st.id] = { a, rula: E.rula(a), est, pid };
+        if (!lastPub[st.id] || S.clock - lastPub[st.id] >= 2) {
+          lastPub[st.id] = S.clock;
+          publish("lancement/vision/" + st.id + "/pose", { epaule: Math.round(a.shoulder), coude_mvt_min: Math.round(a.elbowRate), poignet_dev: Math.round(a.wrist), cou: Math.round(a.neck), tronc: Math.round(a.trunk), rula: S.live[st.id].rula.score, conf: est ? 0.55 : 0.92, source: est ? "estimé (angle mort)" : "observé" }, { from: "Vision", to: ["Serveur edge"], qos: 0, local: true });
+        }
+      }
+    }
+  }
+  function fastForward(toMin) { while (S.clock < toMin) step(60); }
+  let lastT = performance.now();
+  function loop(t) { const dt = Math.min(0.25, (t - lastT) / 1000); lastT = t; if (S.running) step(dt * S.speed); requestAnimationFrame(loop); }
+  function start() { requestAnimationFrame(loop); }
+
+  G.Core = { S, sha256, publish, subscribe, LOG, COUNT, login, logout, can, AUTH, ROLE_TXT, pointage, occupant, byPid, bySlot, hhmm, fastForward, start, inWork };
+})(typeof window !== "undefined" ? window : globalThis);
+
+// ErgoTwin Lancement — jumeau numérique 3D (WebGL natif, hors-ligne), basé sur le modèle Cam-03 de l'équipe.
+// Couleur d'un opérateur = niveau d'exposition AGRÉGÉ de son poste (pas d'identité affichée, D2).
+(function (G) {
+  "use strict";
+  const E = G.Engine, C = G.Core, S = C.S;
+  let gl, canvas, host, labelsBox, prog, A, U, gpu = [], scene = null, sig = "", labelEls = [], tags = [];
+  const V = { view: "orbit", camIdx: 0, orbit: { target: [7, 0.8, 9], yaw: 0.35, pitch: 0.78, dist: 17 }, fly: null, mvp: null, vp: [0, 0, 1, 1],
+    layers: { walls: true, workers: true, coverage: true, frustum: true, zones: false, grid: false, labels: true }, suggested: null, stats: null };
+  const FLOOR = G.ERGOTWIN_FLOOR;
+  const SEATS = FLOOR.props.filter(p => p.type === "worker").slice(0, 5);
+
+  // ---------------------------------------------------------------- maths
+  const norm = v => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  function persp(f, a, n, fa) { const t = 1 / Math.tan(f / 2), nf = 1 / (n - fa); return [t / a, 0, 0, 0, 0, t, 0, 0, 0, 0, (fa + n) * nf, -1, 0, 0, 2 * fa * n * nf, 0]; }
+  function lookAt(e, c, up) { const z = norm(sub(e, c)), x = norm(cross(up, z)), y = cross(z, x); return [x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0, -dot(x, e), -dot(y, e), -dot(z, e), 1]; }
+  function mul(a, b) { const o = new Array(16); for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { let s = 0; for (let k = 0; k < 4; k++) s += a[k * 4 + j] * b[i * 4 + k]; o[i * 4 + j] = s; } return o; }
+
+  // ---------------------------------------------------------------- caméras et aménagement courants
+  function cameras() {
+    const cams = FLOOR.cameras.slice();
+    if (S.cams.close) cams.push(...FLOOR.close_cameras);
+    if (V.suggested) cams.push(V.suggested);
+    return cams;
+  }
+  function layout() { return S.preview || S.layout; }
+  function stationLevel(stId) {
+    if (S.preview && G.Engineer && G.Engineer.previewIdx) { const i = G.Engineer.previewIdx(stId); if (i) return i; }
+    const occ = C.occupant(stId);
+    if (!occ) return { lv: "X", max: 0, txt: "libre" };
+    if (S.paused[occ]) return { lv: "X", max: 0, txt: "suivi en pause" };
+    const idx = E.zoneIndex(S.expoS[stId], S.layout.microPause), max = Math.max(...E.ZK.map(k => idx[k]));
+    const live = S.live[stId];
+    return { lv: E.level(max), max, txt: live ? "RULA " + live.rula.score + (live.est ? " · estimé" : "") : "", zone: E.ZK.reduce((a, k) => (idx[k] > idx[a] ? k : a), "poignet") };
+  }
+  function floorNow() {
+    const L = layout(), f = JSON.parse(JSON.stringify(FLOOR));
+    f.cameras = cameras();
+    const t1 = f.obstacles.find(o => o.id === "T1"); t1.height = L.tableH / 100;
+    let seat = 0;
+    f.props = f.props.map(p => {
+      if (p.type !== "worker") return p;
+      if (seat < 5) { const st = E.STATIONS[seat++], l = stationLevel(st.id); return Object.assign({}, p, { color: E.COL[l.lv] }); }
+      return Object.assign({}, p, { color: "#B8BEC5" });   // autres postes de l'atelier : hors périmètre, gris
+    });
+    const z = L.tableH / 100;
+    // P01 : bacs de tri à la distance d'atteinte réglée
+    const s0 = SEATS[0]; f.props.push({ type: "bin", x: s0.x + 0.25, y: s0.y + L.binDist / 100 - 0.1, w: 0.45, h: 0.35, z, height: 0.18 }, { type: "bin", x: s0.x - 0.7, y: s0.y + L.binDist / 100 - 0.1, w: 0.45, h: 0.35, z, height: 0.18 });
+    if (L.pupitre) [1, 2].forEach(i => f.props.push({ type: "box", x: SEATS[i].x - 0.22, y: SEATS[i].y + 0.5, w: 0.44, h: 0.32, z: z + 0.06, height: 0.02, pitch: -18, color: "#C9A26B" }));
+    if (L.dispenser) [3, 4].forEach(i => f.props.push({ type: "box", x: SEATS[i].x + 0.18, y: SEATS[i].y + 0.5, w: 0.18, h: 0.22, z, height: 0.16, color: "#2F6FD0" }));
+    return f;
+  }
+
+  // ---------------------------------------------------------------- GL
+  function init() {
+    const VS = "attribute vec3 p;attribute vec3 n;attribute vec4 c;uniform mat4 mvp;varying vec3 vn;varying vec4 vc;void main(){gl_Position=mvp*vec4(p,1.0);vn=n;vc=c;}";
+    const FS = "precision mediump float;varying vec3 vn;varying vec4 vc;uniform float lit;uniform vec3 L;void main(){vec3 col=vc.rgb;if(lit>0.5){vec3 nn=normalize(vn);float d=max(dot(nn,L),0.0);float h=0.5+0.5*nn.y;col*=0.36+0.5*d+0.24*h;}gl_FragColor=vec4(col,vc.a);}";
+    const sh = (t, s) => { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); return o; };
+    prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog); gl.useProgram(prog);
+    A = { p: gl.getAttribLocation(prog, "p"), n: gl.getAttribLocation(prog, "n"), c: gl.getAttribLocation(prog, "c") };
+    U = { mvp: gl.getUniformLocation(prog, "mvp"), lit: gl.getUniformLocation(prog, "lit"), L: gl.getUniformLocation(prog, "L") };
+    gl.uniform3fv(U.L, norm([0.45, 0.85, 0.3]));
+  }
+  function rebuild() {
+    const f = floorNow(), g = G.Coverage.buildGrid(f), count = G.Coverage.coverage(g, f.cameras);
+    V.stats = G.Coverage.stats(g, count);
+    SEATS.forEach((p, i) => { const c = Math.floor((p.x) / g.cell), r = Math.floor((p.y) / g.cell); S.visible[E.STATIONS[i].id] = count[r * g.cols + c] || 0; });
+    scene = G.Scene3D.buildScene(f, { coverage: { grid: g, count } });
+    for (const o of gpu) { gl.deleteBuffer(o.bp); gl.deleteBuffer(o.bn); gl.deleteBuffer(o.bc); }
+    gpu = scene.groups.map(gr => { const mk = a => { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, a, gl.STATIC_DRAW); return b; };
+      return { g: gr, bp: mk(gr.positions), bn: mk(gr.normals), bc: mk(gr.colors), count: gr.positions.length / 3 }; });
+    labelsBox.innerHTML = ""; labelEls = scene.labels.filter(l => l.kind === "camera").map(l => { const d = document.createElement("div"); d.className = "lbl camera"; d.textContent = l.text; labelsBox.appendChild(d); return { l, d }; });
+    tags = E.STATIONS.map((st, i) => { const d = document.createElement("div"); d.className = "stag"; labelsBox.appendChild(d); return { st, d, x: SEATS[i].x, y: SEATS[i].y, z: 1.75 }; });
+    if (G.Twin.onStats) G.Twin.onStats(V.stats);
+  }
+  function signature() { const L = layout(); return JSON.stringify([L, cameras().map(c => c.id), E.STATIONS.map(s => stationLevel(s.id).lv)]); }
+  function camPose(cam) { const yaw = cam.yaw * Math.PI / 180, p = (cam.pitch == null ? 35 : cam.pitch) * Math.PI / 180; return { eye: [cam.x, cam.height || 2.5, cam.y], dir: [Math.cos(yaw) * Math.cos(p), -Math.sin(p), Math.sin(yaw) * Math.cos(p)], vf: (cam.vfov || 40) * Math.PI / 180 }; }
+  function draw(o) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, o.bp); gl.vertexAttribPointer(A.p, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, o.bn); gl.vertexAttribPointer(A.n, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, o.bc); gl.vertexAttribPointer(A.c, 4, gl.FLOAT, false, 0, 0);
+    gl.uniform1f(U.lit, o.g.kind === "lines" ? 0 : 1); gl.drawArrays(o.g.kind === "lines" ? gl.LINES : gl.TRIANGLES, 0, o.count);
+  }
+  const vis = o => { if (V.view === "cam" && o.g.camId && o.g.camId === cameras()[V.camIdx].id) return false; return o.g.layer === "model" || o.g.layer === "cameras" || V.layers[o.g.layer]; };
+  let tSig = 0;
+  function frame(t) {
+    requestAnimationFrame(frame);
+    if (!host || !host.offsetParent) return;                // vue cachée : rien à dessiner
+    if (t - tSig > 800) { tSig = t; const s = signature(); if (s !== sig) { sig = s; rebuild(); } }
+    const dpr = Math.min(2, window.devicePixelRatio || 1), W = canvas.clientWidth, H = canvas.clientHeight;
+    if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) { canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); }
+    gl.viewport(0, 0, canvas.width, canvas.height); gl.clearColor(0.93, 0.94, 0.95, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    let proj, view, vx = 0, vy = 0, vw = W, vh = H;
+    if (V.view === "cam") {
+      const asp = 16 / 9; if (W / H > asp) { vw = H * asp; vx = (W - vw) / 2; } else { vh = W / asp; vy = (H - vh) / 2; }
+      gl.viewport(Math.round(vx * dpr), Math.round((H - vy - vh) * dpr), Math.round(vw * dpr), Math.round(vh * dpr));
+      const { eye, dir, vf } = V.fly; proj = persp(vf, asp, 0.05, 300); view = lookAt(eye, [eye[0] + dir[0], eye[1] + dir[1], eye[2] + dir[2]], [0, 1, 0]);
+    } else {
+      const o = V.orbit, cp = Math.cos(o.pitch), eye = [o.target[0] + o.dist * cp * Math.sin(o.yaw), o.target[1] + o.dist * Math.sin(o.pitch), o.target[2] + o.dist * cp * Math.cos(o.yaw)];
+      proj = persp(50 * Math.PI / 180, W / H, 0.1, 500); view = lookAt(eye, o.target, Math.abs(o.pitch) > 1.55 ? [0, 0, -1] : [0, 1, 0]);
+    }
+    V.mvp = mul(proj, view); V.vp = [vx, vy, vw, vh];
+    gl.uniformMatrix4fv(U.mvp, false, new Float32Array(V.mvp));
+    [A.p, A.n, A.c].forEach(a => gl.enableVertexAttribArray(a));
+    gl.enable(gl.DEPTH_TEST); gl.disable(gl.CULL_FACE); gl.disable(gl.BLEND); gl.depthMask(true);
+    for (const o of gpu) if (vis(o) && !o.g.transparent && o.g.kind !== "lines") draw(o);
+    gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    for (const o of gpu) if (vis(o) && o.g.kind === "lines") draw(o);
+    gl.depthMask(false); for (const layer of ["coverage", "model", "walls"]) for (const o of gpu) if (vis(o) && o.g.transparent && o.g.layer === layer) draw(o); gl.depthMask(true);
+    place();
+  }
+  function proj3(X, Y, Z) { const m = V.mvp, [vx, vy, vw, vh] = V.vp; const cx = m[0] * X + m[4] * Y + m[8] * Z + m[12], cy = m[1] * X + m[5] * Y + m[9] * Z + m[13], cw = m[3] * X + m[7] * Y + m[11] * Z + m[15];
+    if (cw <= 0.1) return null; return [vx + (cx / cw * 0.5 + 0.5) * vw, vy + (1 - (cy / cw * 0.5 + 0.5)) * vh]; }
+  function place() {
+    for (const { l, d } of labelEls) { const p = V.layers.labels && proj3(l.x, l.z, l.y); d.style.display = p ? "block" : "none"; if (p) { d.style.left = p[0] + "px"; d.style.top = p[1] + "px"; } }
+    for (const t of tags) {
+      const p = proj3(t.x, t.z, t.y), l = stationLevel(t.st.id);
+      if (!p) { t.d.style.display = "none"; continue; }
+      t.d.style.display = "flex"; t.d.style.left = p[0] + "px"; t.d.style.top = p[1] + "px";
+      t.d.innerHTML = '<i style="background:' + E.COL[l.lv] + '"></i><b>' + t.st.id + "</b>" + (V.orbit.dist < 9 || V.view === "cam" ? " " + E.TASKS[t.st.task].name + (l.txt ? " · " + l.txt : "") : "") + (S.visible[t.st.id] === 0 ? ' <em>angle mort</em>' : "");
+    }
+  }
+  // ---------------------------------------------------------------- vues et commandes
+  function setView(v, i) {
+    V.view = v; V.camIdx = i || 0;
+    if (v === "orbit") V.orbit = { target: [7, 0.8, 9], yaw: 0.35, pitch: 0.78, dist: 17 };
+    if (v === "top") { V.orbit = { target: [8.5, 0, 8.25], yaw: 0, pitch: 1.5607, dist: 26 }; V.view = "orbit"; }
+    if (v === "table") { V.orbit = { target: [7.2, 0.9, 9], yaw: 3.0, pitch: 0.55, dist: 6.5 }; V.view = "orbit"; }
+    if (v === "cam") V.fly = camPose(cameras()[V.camIdx]);
+    host.querySelectorAll("[data-v]").forEach(b => b.classList.toggle("on", b.dataset.v === v + (v === "cam" ? i : "")));
+  }
+  let looping = false;
+  function mount(el) {
+    host = el; gpu = []; sig = "";
+    el.innerHTML = '<canvas class="gl"></canvas><div class="labels"></div>' +
+      '<div class="tw-tools"><div class="row" id="tw-views"></div><div class="row" id="tw-layers"></div><div class="row"><label class="chk"><input type="checkbox" id="tw-close" checked> 2 caméras rapprochées (poignets/coudes)</label><button class="btn sm" id="tw-sug">Ajouter la caméra suggérée</button></div><div class="note" id="tw-note"></div></div>';
+    canvas = el.querySelector("canvas"); labelsBox = el.querySelector(".labels");
+    gl = canvas.getContext("webgl", { antialias: true }) || canvas.getContext("experimental-webgl");
+    if (!gl) { el.querySelector(".tw-tools").innerHTML = "WebGL n'est pas disponible dans ce navigateur."; return; }
+    init();
+    const views = el.querySelector("#tw-views"), add = (t, v, i) => { const b = document.createElement("button"); b.className = "btn sm"; b.textContent = t; b.dataset.v = v + (v === "cam" ? i : ""); b.onclick = () => setView(v, i); views.appendChild(b); };
+    add("3D", "orbit"); add("Dessus", "top"); add("Table Lancement", "table"); add("Vue Cam-03", "cam", 0);
+    const LN = { coverage: "Couverture", frustum: "Champs caméra", workers: "Opérateurs", walls: "Murs", zones: "Zones", labels: "Étiquettes" };
+    const ly = el.querySelector("#tw-layers");
+    Object.keys(LN).forEach(k => { const l = document.createElement("label"); l.className = "chk"; l.innerHTML = '<input type="checkbox" ' + (V.layers[k] ? "checked" : "") + "> " + LN[k]; l.querySelector("input").onchange = e => (V.layers[k] = e.target.checked); ly.appendChild(l); });
+    el.querySelector("#tw-close").onchange = e => { S.cams.close = e.target.checked; C.publish("lancement/twin/cameras", { rapprochees: S.cams.close }, { from: "Jumeau 3D", to: ["Vision"] }); };
+    el.querySelector("#tw-sug").onclick = e => {
+      if (V.suggested) { V.suggested = null; e.target.textContent = "Ajouter la caméra suggérée"; el.querySelector("#tw-note").textContent = ""; return; }
+      e.target.textContent = "Recherche…";
+      setTimeout(() => { const f = floorNow(); const s = G.Coverage.suggest(f, { add: true });
+        V.suggested = Object.assign({}, s.cam, { id: "SUG", label: "Caméra suggérée", suggested: true });
+        e.target.textContent = "Retirer la caméra suggérée";
+        el.querySelector("#tw-note").innerHTML = "Position (" + s.to.x.toFixed(1) + " ; " + s.to.y.toFixed(1) + ") m · sol vu " + s.before.seen + " % → <b>" + s.after.seen + " %</b>, angle mort " + s.before.blind + " % → " + s.after.blind + " %."; }, 30);
+    };
+    let drag = null;
+    canvas.addEventListener("contextmenu", e => e.preventDefault());
+    canvas.addEventListener("pointerdown", e => { canvas.setPointerCapture(e.pointerId); if (V.view === "cam") { V.view = "orbit"; } drag = { x: e.clientX, y: e.clientY, pan: e.button === 2 || e.shiftKey }; });
+    canvas.addEventListener("pointermove", e => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY; const o = V.orbit;
+      if (drag.pan) { const s = o.dist * 0.0016, cy = Math.cos(o.yaw), sy = Math.sin(o.yaw); o.target[0] += -dx * cy * s - dy * sy * s; o.target[2] += dx * sy * s - dy * cy * s; }
+      else { o.yaw -= dx * 0.006; o.pitch = Math.min(1.5607, Math.max(0.05, o.pitch + dy * 0.005)); } });
+    const end = () => (drag = null); canvas.addEventListener("pointerup", end); canvas.addEventListener("pointercancel", end);
+    canvas.addEventListener("wheel", e => { e.preventDefault(); V.orbit.dist = Math.min(80, Math.max(2, V.orbit.dist * Math.exp(e.deltaY * 0.0012))); }, { passive: false });
+    setView("table"); if (!looping) { looping = true; requestAnimationFrame(frame); }
+  }
+  // visibilité des 5 places sans rendu (utilisée au démarrage, avant tout login)
+  function computeVisibility() { const f = floorNow(), g = G.Coverage.buildGrid(f), count = G.Coverage.coverage(g, f.cameras);
+    SEATS.forEach((p, i) => { const c = Math.floor(p.x / g.cell), r = Math.floor(p.y / g.cell); S.visible[E.STATIONS[i].id] = count[r * g.cols + c] || 0; }); return G.Coverage.stats(g, count); }
+  G.Twin = { mount, V, stationLevel, cameras, computeVisibility, refresh: () => (sig = ""), onStats: null };
+})(window);
+
+// ErgoTwin Lancement — tablette de pointage (Galaxy Tab A9 + terminal ESP32/R307).
+// Règles : l'opératrice ne voit QUE son propre bilan, formulé comme l'exposition imposée par le poste (D1, M2).
+(function (G) {
+  "use strict";
+  const E = G.Engine, C = G.Core, S = C.S;
+  let root, lang = "fr", T = null, who = null, qs = [], qi = 0, ans = {};
+  const $ = s => root.querySelector(s);
+  const FP = '<svg viewBox="0 0 100 100" fill="none" stroke="#16a34a" stroke-width="3.2" stroke-linecap="round"><path d="M13 62V52A37 41 0 0 1 87 52V58"/><path d="M20 74V52A30 34 0 0 1 80 52V56M80 63V70"/><path d="M27 84V68M27 62V52A23 27 0 0 1 73 52V78"/><path d="M34 90V52A16 20 0 0 1 66 52V68M66 74V84"/><path d="M41 86V52A9 13 0 0 1 59 52V82"/><path d="M50 54V90"/></svg>';
+  const CK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const TX = {
+    put: ["Posez votre doigt sur le lecteur", "حطّ صبعك على القارئ"], putS: ["Ou passez votre badge (si vous avez refusé l'empreinte)", "ولا عدّي البادج متاعك"],
+    hello: ["Bonjour", "صباح الخير"], what: ["Que voulez-vous faire ?", "شنوّة تحبّ تعمل؟"],
+    start: ["Commencer · choisir mon poste", "نبدا · نختار البوسط"], change: ["Changer de poste", "نبدّل البوسط"],
+    mp: ["Prendre une micro-pause (3 min)", "نرتاح شويّة (3 دقايق)"], pause: ["Suspendre le suivi caméra", "نوقّف المتابعة بالكاميرا"], resume: ["Reprendre le suivi", "نرجّع المتابعة"],
+    report: ["Signaler un problème au poste", "نبلّغ على مشكل في البوسط"], end: ["Terminer ma journée", "نكمّل نهاري"],
+    choose: ["Choisissez votre poste", "اختار البوسط متاعك"], ok: ["Poste validé", "تسجّل البوسط"], free: ["libre", "فارغ"], taken: ["occupé", "فيه حد"],
+    day: ["Votre journée au poste", "نهارك في الخدمة"], dayS: ["Ce bilan est à vous seule. Il décrit ce que le poste a demandé à votre corps, pas votre façon de travailler.", "هالحصيلة ليك وحدك. تحكي على شنوّة طلب البوسط من بدنك، موش على طريقة خدمتك."],
+    q0: ["Aujourd'hui, avez-vous ressenti une douleur ou un engourdissement à la main, au coude, à l'épaule ou au cou ?", "اليوم، حسّيت بوجيعة ولا تنميل في يدك، كوعك، كتفك ولا رقبتك؟"],
+    yes: ["Oui", "إيه"], no: ["Non", "لا"], thanks: ["Merci, vos réponses vont au médecin du travail uniquement.", "يعطيك الصحّة، الإجابات تمشي للطبيب متاع الشغل برك."],
+    bye: ["Bonne soirée", "تصبح على خير"], unk: ["Empreinte non reconnue. Réessayez ou utilisez votre badge.", "ما عرفناش الصبع. عاود ولا استعمل البادج."],
+    alert: ["Le poste a beaucoup sollicité certaines zones aujourd'hui. Quelques questions courtes, pour le médecin du travail :", "البوسط تعّب شويّة بعض البلايص اليوم. أسئلة قصار للطبيب متاع الشغل:"],
+    rep: ["Quel problème voulez-vous signaler ?", "شنوّة المشكل؟"], repOk: ["Merci. Le signalement est anonyme et va à l'équipe ergonomie.", "يعطيك الصحّة. البلاغ بلا اسم ويمشي لفريق الأرغونوميا."],
+    mpOk: ["Bonne pause. Le suivi reprend dans 3 minutes.", "راحة طيّبة. المتابعة ترجع بعد 3 دقايق."], pOk: ["Suivi caméra suspendu pour vous. Rien n'est mesuré à votre poste.", "المتابعة وقفت. حتى شي ما يتقاس في البوسط متاعك."],
+    pref: ["Vos micro-pauses : quand les prendre ?", "وقتاش تحبّ ترتاح؟"],
+  };
+  const t = k => TX[k][lang === "fr" ? 0 : 1];
+  const Q = {
+    poignet: [["Douleur au poignet, du côté du pouce ?", "عندك وجيعة في معصمك تحت الصبع الكبير؟", 1], ["Main engourdie, fourmillements (surtout la nuit) ?", "يدك تركد منها وتتنمّل (خاصّة في الليل)؟", 1], ["Pouvez-vous serrer un objet aussi fort que d'habitude ?", "تنجّم تشدّ حاجة بقوّة كيف العادة؟", 0]],
+    coude: [["Douleur au coude (le jour ou la nuit) ?", "عندك وجيعة في مرفقك (في النهار ولا في الليل)؟", 1], ["Douleur quand vous tournez l'avant-bras ou soulevez un objet ?", "الوجيعة تزيد كي تدوّر يدك ولا ترفع حاجة؟", 1]],
+    epaule: [["Pouvez-vous lever le bras au-dessus de la tête sans douleur ?", "تنجّم تهزّ يدك لفوق بلا وجيعة؟", 0], ["Douleur à l'épaule la nuit ?", "عندك وجيعة في كتفك في الليل؟", 1]],
+    cou: [["Douleur ou raideur au cou ?", "عندك وجيعة ولا تشنّج في رقبتك؟", 1]],
+    tronc: [["Douleur dans le dos ?", "عندك وجيعة في ظهرك؟", 1]],
+  };
+  const REP = [["Bacs ou piles trop loin", "الصناديق بعاد"], ["Plan de travail trop haut / trop bas", "الطاولة عالية ولا طايحة"], ["Étiquettes difficiles à décoller", "الإتيكات صعيبة"], ["Cadence trop rapide", "الريتم سريع برشا"], ["Éclairage insuffisant", "الضوء قليل"], ["Autre", "حاجة أخرى"]];
+
+  function screen(h, cls) { clearTimeout(T); $("#k-app").innerHTML = '<section class="kpt ' + (cls || "") + '"><div class="kst">' + h + "</div></section>"; }
+  function back(ms) { T = setTimeout(idle, ms || 5000); }
+  function idle() { who = null; screen('<button class="fp" id="k-fp" aria-label="Lecteur d’empreinte">' + FP + '<span class="ln"></span></button><h1>' + t("put") + '</h1><p class="sub">' + t("putS") + "</p>"); $("#k-fp").onclick = () => scan(C.S.kioskFinger || 1); }
+  function scan(slot) {
+    const f = $("#k-fp"); if (f) f.classList.add("scan");
+    C.publish("lancement/terminal/T01/touch", { gpio: 4, wake: true }, { from: "ESP32 + R307", to: ["ESP32 + R307"], local: true });
+    T = setTimeout(() => {
+      const w = C.bySlot(slot);
+      if (!w) { C.publish("lancement/terminal/T01/fp", { match: false }, { from: "ESP32 + R307", to: ["Serveur edge"] }); screen('<h1 style="color:#b91c1c">' + t("unk") + "</h1>"); return back(3500); }
+      who = w; menu();
+    }, 1300);
+  }
+  function menu() {
+    const on = !!S.assign[who.pid], p = S.paused[who.pid];
+    const items = on ? [["change", "change"], ["mp", "mp"], [p ? "resume" : "pause", p ? "resume" : "pause"], ["report", "report"], ["end", "end"]] : [["start", "start"], ["report", "report"]];
+    screen('<div class="chk sm">' + CK + '</div><h1>' + t("hello") + ' <span class="pid">' + who.pid + '</span></h1><p class="sub">' + t("what") + '</p><div class="kmenu">' +
+      items.map(([k]) => '<button data-k="' + k + '" class="' + (k === "end" ? "kend" : "") + '">' + t(k) + "</button>").join("") + "</div>");
+    root.querySelectorAll(".kmenu button").forEach(b => (b.onclick = () => act(b.dataset.k)));
+    T = setTimeout(idle, 20000);
+  }
+  function act(k) {
+    if (k === "start" || k === "change") return choose(k === "start" ? "entree" : "changement");
+    if (k === "mp") { C.pointage(who.pid, "pause", null, "micro-pause"); const pid = who.pid, until = S.clock + 3; const iv = setInterval(() => { if (S.clock >= until) { clearInterval(iv); if (S.paused[pid]) C.pointage(pid, "reprise", null, "fin micro-pause"); } }, 300); screen('<div class="chk">' + CK + "</div><h1>" + t("mpOk") + "</h1>"); return back(3500); }
+    if (k === "pause") { C.pointage(who.pid, "pause", null, "suivi suspendu (H2)"); screen('<div class="chk">' + CK + "</div><h1>" + t("pOk") + "</h1>"); return back(4000); }
+    if (k === "resume") { C.pointage(who.pid, "reprise", null, "tablette"); screen('<div class="chk">' + CK + "</div><h1>" + t("ok") + "</h1>"); return back(2500); }
+    if (k === "report") return report();
+    if (k === "end") return bilan();
+  }
+  function choose(action) {
+    screen("<h1>" + t("choose") + '</h1><div class="kgrid">' + E.STATIONS.map(s => { const o = C.occupant(s.id), mine = o === who.pid;
+      return '<button data-s="' + s.id + '" class="' + (mine ? "mine" : o ? "taken" : "") + '"><b>' + s.id.replace("P0", "") + '</b><span>' + E.TASKS[s.task].icon + " " + E.TASKS[s.task].name + "</span><small>" + (mine ? "✓" : o ? t("taken") : t("free")) + "</small></button>"; }).join("") + "</div>");
+    root.querySelectorAll(".kgrid button").forEach(b => (b.onclick = () => {
+      const st = b.dataset.s, old = S.assign[who.pid]; C.pointage(who.pid, action, st, "tablette");
+      const s = E.STATIONS.find(x => x.id === st);
+      screen('<div class="chk">' + CK + "</div><h1>" + t("ok") + '</h1><div class="poste"><small>' + E.TASKS[s.task].name + "</small><strong>N° " + st.replace("P0", "") + "</strong></div>" + (old && old !== st ? '<p class="sub">Ancien poste : N° ' + old.replace("P0", "") + "</p>" : ""));
+      back(4500);
+    }));
+  }
+  function report() {
+    screen("<h1>" + t("rep") + '</h1><div class="kmenu">' + REP.map((r, i) => '<button data-i="' + i + '">' + r[lang === "fr" ? 0 : 1] + "</button>").join("") + "</div>");
+    root.querySelectorAll(".kmenu button").forEach(b => (b.onclick = () => {
+      const st = S.assign[who.pid] || "P0?", r = { st, cat: REP[+b.dataset.i][0], ts: S.clock };
+      S.reports.push(r);
+      C.publish("lancement/signalement", { poste: st, categorie: r.cat }, { from: "Tablette", to: ["Serveur edge", "Dashboard ingénieur"] });  // sans pseudonyme
+      screen('<div class="chk">' + CK + "</div><h1>" + t("repOk") + "</h1>"); back(3500);
+    }));
+  }
+  const KL = { G: ["Peu sollicité", "خفيف"], O: ["Sollicité", "متعب شويّة"], R: ["Très sollicité", "متعب برشا"] };
+  function fmtMin(m) { m = Math.round(m); return m < 60 ? m + " min" : Math.floor(m / 60) + " h " + String(m % 60).padStart(2, "0"); }
+  function bilan() {
+    const Ex = S.expoW[who.pid], idx = E.zoneIndex(Ex, S.layout.microPause);
+    C.publish("lancement/kiosk/T01/bilan", { pid: who.pid, indices: idx }, { from: "Serveur edge", to: ["Tablette"], priv: true });
+    const zones = ["poignet", "coude", "epaule", "cou", "tronc"];
+    const cards = zones.map(z => { const lv = E.level(idx[z]), min = z === "epaule" ? Ex.epaule : Ex[z];
+      return '<div class="zc ' + lv + '"><b>' + (lang === "fr" ? E.ZONES[z].n : E.ZONES[z].ar) + "</b><span>" + KL[lv][lang === "fr" ? 0 : 1] + "</span><small>" + fmtMin(min) + (lang === "fr" ? " exigeantes" : "") + "</small></div>"; }).join("");
+    screen("<h1>" + t("day") + '</h1><p class="sub">' + t("dayS") + '</p><div class="zcs">' + cards + '</div><div class="qt">' + t("q0") + '</div><div class="ans"><button class="yes" id="q0y">' + t("yes") + '</button><button class="no" id="q0n">' + t("no") + "</button></div>", lang === "ar" ? "rtl" : "");
+    const hot = zones.filter(z => idx[z] >= 40);
+    $("#q0y").onclick = () => startQ(true, hot.length ? hot : ["poignet", "coude", "epaule", "cou"]);
+    $("#q0n").onclick = () => startQ(false, hot);
+  }
+  function startQ(pain, zones) {
+    ans = { pid: who.pid, jour: "J", douleur: pain ? 1 : 0, zones: {} };
+    qs = []; zones.forEach(z => (Q[z] || []).forEach(q => qs.push({ z, q }))); qi = 0;
+    if (!qs.length) return finish();
+    screen('<div class="alert">' + t("alert") + '</div><button class="btn big" id="qgo">→</button>', lang === "ar" ? "rtl" : "");
+    $("#qgo").onclick = ask;
+  }
+  function ask() {
+    if (qi >= qs.length) return finish();
+    const { z, q } = qs[qi];
+    let d = ""; for (let i = 0; i < qs.length; i++) d += '<i class="' + (i < qi ? "d" : "") + '"></i>';
+    screen('<div class="dots">' + d + '</div><div class="grp">' + (lang === "fr" ? E.ZONES[z].n : E.ZONES[z].ar) + '</div><div class="qt">' + q[lang === "fr" ? 0 : 1] + '</div><div class="ans"><button class="yes" data-v="1">' + t("yes") + '</button><button class="no" data-v="0">' + t("no") + "</button></div>", lang === "ar" ? "rtl" : "");
+    root.querySelectorAll(".ans button").forEach(b => (b.onclick = () => { const v = +b.dataset.v, pos = q[2] === 1 ? v : 1 - v; ans.zones[z] = Math.max(ans.zones[z] || 0, pos); qi++; ask(); }));
+  }
+  function finish() {
+    ans.ts = S.clock; S.answers.push(ans);
+    C.publish("lancement/questionnaire", { pid: ans.pid, chiffré: "AES-256-GCM", destinataire: "médecin" }, { from: "Tablette", to: ["Serveur edge", "Espace médecin"], priv: true });
+    screen("<h1>" + t("pref") + '</h1><div class="kmenu">' + ["Toutes les heures", "Quand je le sens", "Avant / après la rotation"].map(x => '<button data-x="' + x + '">' + x + "</button>").join("") + "</div>");
+    root.querySelectorAll(".kmenu button").forEach(b => (b.onclick = () => { S.prefs[who.pid].pause = b.dataset.x; out(); }));
+  }
+  function out() { C.pointage(who.pid, "sortie", null, "tablette"); screen('<div class="chk">' + CK + "</div><h1>" + t("thanks") + '</h1><p class="sub">' + t("bye") + "</p>"); back(5000); }
+
+  function mount(el) {
+    root = el;
+    el.innerHTML = '<div class="kdemo"><b>Simulation du capteur (hors interface opératrice)</b><span>Doigt posé :</span>' +
+      E.WORKERS.map(w => '<button data-slot="' + w.slot + '" class="' + (w.slot === 1 ? "on" : "") + '">' + w.pid + "</button>").join("") + '<button data-slot="99">Inconnu</button>' +
+      '<span class="sep"></span><button id="k-lang">العربية / Français</button></div><div class="ktab"><div class="kframe"><div id="k-app"></div></div><p class="note">Tablette Samsung Galaxy Tab A9 en mode kiosque · lecteur R307 relié à l’ESP32 (UART) · liaison Wi-Fi WPA2-Entreprise vers le serveur edge (MQTT/TLS).</p></div>';
+    S.kioskFinger = 1;
+    el.querySelectorAll(".kdemo [data-slot]").forEach(b => (b.onclick = () => { el.querySelectorAll(".kdemo [data-slot]").forEach(x => x.classList.remove("on")); b.classList.add("on"); S.kioskFinger = +b.dataset.slot; idle(); }));
+    el.querySelector("#k-lang").onclick = () => { lang = lang === "fr" ? "ar" : "fr"; idle(); };
+    idle();
+  }
+  G.Kiosk = { mount };
+})(window);
+
+// ErgoTwin Lancement — espace Ingénieur concepteur (accès par login). Données AGRÉGÉES par poste uniquement (D2).
+(function (G) {
+  "use strict";
+  const E = G.Engine, C = G.Core, S = C.S;
+  let root, tab = "twin", hist = null, base = null, prev = null, prevL = null, twinMounted = false;
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  const fmt = (n, d) => Number(n).toLocaleString("fr-FR", { maximumFractionDigits: d || 0, minimumFractionDigits: d || 0 });
+  const badge = v => '<span class="bdg ' + E.level(v) + '">' + v + "</span>";
+  const rulaB = r => '<span class="bdg ' + (r >= 5 ? "R" : r >= 3 ? "O" : "G") + '">' + fmt(r, 1) + "</span>";
+
+  function loginView(msg) {
+    root.innerHTML = '<div class="login card"><h2>🔒 Espace Ingénieur concepteur</h2><p class="note">Accès réservé. Les données affichées sont agrégées par poste ; aucune donnée individuelle de santé n\'est accessible ici (exigences D1, D2).</p>' +
+      '<form id="lf"><label>Identifiant<input id="lu" autocomplete="username" value=""></label><label>Mot de passe<input id="lp" type="password" autocomplete="current-password"></label><button class="btn go">Se connecter</button><p class="err">' + (msg || "") + '</p></form><p class="note">Démo : <code>ingenieur</code> / <code>Ergo#2026</code> · verrouillage 60 s après 5 échecs · session fermée après 15 min d\'inactivité.</p></div>';
+    root.querySelector("#lf").onsubmit = e => { e.preventDefault(); const r = C.login(root.querySelector("#lu").value, root.querySelector("#lp").value);
+      if (r.ok && r.role === "engineer") render(); else if (r.ok) { C.logout(); loginView("Ce compte n'a pas accès à l'espace ingénieur."); } else loginView(r.msg); };
+  }
+  function ensureData() {
+    if (!hist) hist = E.history(30, 42);
+    base = E.simulateDay(S.layout, { dt: 30 });
+  }
+  function render() {
+    if (!C.can("engineer")) return loginView();
+    ensureData();
+    root.innerHTML = '<div class="etop"><div><span class="eyebrow">Section Lancement · TLS · données agrégées par poste</span><h2>Espace Ingénieur concepteur</h2></div><div class="who">' + esc(C.AUTH.user) + ' · ' + C.ROLE_TXT.engineer + ' <button class="btn sm" id="lo">Se déconnecter</button></div></div>' +
+      '<div class="tabs">' + [["twin", "Jumeau 3D en direct"], ["month", "Synthèse 30 jours"], ["whatif", "Simulation What-If"], ["kaizen", "Essais Kaizen"], ["roi", "Retour sur investissement"]].map(x => '<button data-t="' + x[0] + '" class="' + (tab === x[0] ? "on" : "") + '">' + x[1] + "</button>").join("") + '</div><div id="ebody"></div>';
+    root.querySelector("#lo").onclick = () => { C.logout(); S.preview = null; twinMounted = false; loginView(); };
+    root.querySelectorAll(".tabs button").forEach(b => (b.onclick = () => { tab = b.dataset.t; render(); }));
+    const body = root.querySelector("#ebody");
+    if (tab === "twin") twinView(body); else if (tab === "month") monthView(body); else if (tab === "whatif") whatIfView(body); else if (tab === "kaizen") kaizenView(body); else roiView(body);
+  }
+
+  // ---------------------------------------------------------------- jumeau live
+  function twinView(body) {
+    body.innerHTML = '<div class="twin-wrap"><div class="twin" id="twin"></div><aside class="tside"><div class="card"><h3>Couverture des caméras</h3><div class="tiles"><div class="tile G"><b id="cv-m">–</b><span>2+ caméras</span></div><div class="tile O"><b id="cv-s">–</b><span>1 caméra</span></div><div class="tile R"><b id="cv-b">–</b><span>angle mort</span></div></div><p class="note">Ray-casting sur grille 20 cm. Dans un angle mort, la posture est <b>estimée</b> (filtre à particules) et marquée comme telle.</p></div>' +
+      '<div class="card"><h3>Postes en direct <small id="clk2"></small></h3><div id="live"></div></div>' + (S.preview ? '<div class="card prevbox"><b>Mode simulation</b> : le jumeau affiche l\'aménagement testé. <button class="btn sm" id="unprev">Revenir à l\'état réel</button></div>' : "") + "</aside></div>";
+    G.Twin.onStats = st => { const s = id => document.getElementById(id); if (s("cv-m")) { s("cv-m").textContent = st.multi + " %"; s("cv-s").textContent = st.single + " %"; s("cv-b").textContent = st.blind + " %"; } };
+    G.Twin.mount(body.querySelector("#twin")); G.Twin.refresh();
+    const u = body.querySelector("#unprev"); if (u) u.onclick = () => { S.preview = null; render(); };
+    liveLoop();
+  }
+  function liveLoop() {
+    const box = document.getElementById("live"); if (!box) return;
+    document.getElementById("clk2").textContent = C.hhmm(S.clock);
+    box.innerHTML = E.STATIONS.map(st => { const l = G.Twin.stationLevel(st.id), lv = S.live[st.id], idx = E.zoneIndex(S.expoS[st.id], S.layout.microPause);
+      return '<div class="lrow"><i style="background:' + E.COL[l.lv] + '"></i><b>' + st.id + "</b><span>" + E.TASKS[st.task].name + "</span><small>" + (lv ? "RULA " + lv.rula.score + " · épaule " + Math.round(lv.a.shoulder) + "° · poignet " + Math.round(lv.a.wrist) + "°" + (lv.est ? " · estimé" : "") : l.txt) + "</small>" +
+        '<div class="zbar">' + ["poignet", "coude", "epaule", "cou"].map(z => '<span title="' + E.ZONES[z].n + " " + idx[z] + '" class="' + E.level(idx[z]) + '" style="width:' + Math.max(3, idx[z]) / 4 + 'px"></span>').join("") + "</div></div>"; }).join("") +
+      '<p class="note">Indice cumulé du jour par poste (poignet · coude · épaule · cou). Les opératrices ne sont pas identifiées ici.</p>';
+    setTimeout(liveLoop, 1000);
+  }
+
+  // ---------------------------------------------------------------- synthèse mensuelle
+  function monthView(body) {
+    const N = hist.length, agg = {}, rep = {};
+    E.STATIONS.forEach(s => { agg[s.id] = { z: {}, rula: 0, hi: 0, trend: [] }; E.ZK.forEach(z => (agg[s.id].z[z] = 0)); rep[s.id] = 0; });
+    hist.forEach(h => E.STATIONS.forEach(s => { const x = h.day.sIdx[s.id]; E.ZK.forEach(z => (agg[s.id].z[z] += x.idx[z] / N)); agg[s.id].rula += x.rula / N; agg[s.id].hi += x.hi / N; agg[s.id].trend.push(Math.max(...E.ZK.map(z => x.idx[z]))); }));
+    // signalements : catégories agrégées par poste (sans pseudonyme)
+    const cats = ["Bacs ou piles trop loin", "Étiquettes difficiles à décoller", "Cadence trop rapide", "Plan de travail trop haut / trop bas"];
+    const demo = { P01: [3, 0, 1, 0], P02: [0, 0, 2, 1], P03: [0, 0, 1, 0], P04: [0, 4, 1, 0], P05: [0, 3, 0, 0] };
+    S.reports.forEach(r => { if (demo[r.st]) { const i = cats.indexOf(r.cat); if (i >= 0) demo[r.st][i]++; } });
+    E.STATIONS.forEach(s => (rep[s.id] = demo[s.id].reduce((a, b) => a + b, 0)));
+    const recs = E.recommend(S.layout, base);
+    const spark = a => { const w = 90, h = 24, mx = 100; return '<svg viewBox="0 0 ' + w + " " + h + '" class="spark"><polyline fill="none" stroke="currentColor" stroke-width="1.6" points="' + a.map((v, i) => (i * w / (a.length - 1)).toFixed(1) + "," + (h - v / mx * h).toFixed(1)).join(" ") + '"/></svg>'; };
+    const urgent = E.STATIONS.filter(s => agg[s.id].rula >= 5 && rep[s.id] >= 3).length;
+    const cad = base.cadence;
+    body.innerHTML = '<p class="headline">' + urgent + " postes sur 5 cumulent un score RULA ≥ 5 et au moins 3 signalements. Cadence actuelle tenue : " + fmt(cad.packets) + " paquets/jour (objectif " + fmt(E.PACKETS_TARGET) + ").</p>" +
+      '<div class="kpis"><div class="kpi"><span>Score RULA moyen du poste</span><b>' + fmt(E.STATIONS.reduce((t, s) => t + agg[s.id].rula, 0) / 5, 1) + '<small>/7</small></b><em>Niveau 3 : à changer bientôt</em></div>' +
+      '<div class="kpi"><span>Temps en RULA ≥ 5</span><b>' + fmt(100 * E.STATIONS.reduce((t, s) => t + agg[s.id].hi, 0) / 5) + '<small>%</small></b><em>moyenne des 5 postes, caméra</em></div>' +
+      '<div class="kpi"><span>Signalements (30 j)</span><b>' + E.STATIONS.reduce((t, s) => t + rep[s.id], 0) + '</b><em>anonymes, par poste</em></div>' +
+      '<div class="kpi"><span>Cycle par paquet</span><b>5,4<small> s</small></b><em>< 30 s : répétitivité élevée (OCRA)</em></div></div>' +
+      '<div class="card"><h3>Postes du plus exposé au moins exposé (moyenne 30 jours)</h3><div class="tablewrap"><table><thead><tr><th>Poste</th><th>RULA<br><small>caméra</small></th><th>Poignet</th><th>Coude</th><th>Épaule</th><th>Cou</th><th>Dos</th><th>Tendance 30 j<br><small>zone max</small></th><th>Signalements<br><small>travailleuses</small></th></tr></thead><tbody>' +
+      E.STATIONS.slice().sort((a, b) => agg[b.id].rula - agg[a.id].rula).map(s => { const a = agg[s.id]; return "<tr><td><b>" + s.id + "</b> " + s.label + "</td><td>" + rulaB(a.rula) + "</td>" + E.ZK.map(z => "<td>" + badge(Math.round(a.z[z])) + "</td>").join("") + "<td>" + spark(a.trend) + "</td><td>" + rep[s.id] + "</td></tr>"; }).join("") +
+      '</tbody></table></div><p class="note">Indice 0–100 par zone : 50 = seuil journalier d\'exposition atteint (tableau des MP, ISO 11226, ISO 11228-3). <span class="bdg G">&lt; 40</span> faible · <span class="bdg O">40–64</span> à surveiller · <span class="bdg R">≥ 65</span> élevée.</p></div>' +
+      '<div class="card"><h3>Recommandations du moteur de règles</h3>' + recs.map(r => '<div class="rec"><div><b>' + esc(r.titre) + '</b><p class="note">Problème détecté : ' + esc(r.probleme) + " · Postes " + r.st.join(", ") + '</p><div class="tagrow"><span class="tg n">' + r.norme + '</span><span class="tg m">' + r.methode + '</span><span class="tg">Effort ' + r.effort + '</span><span class="tg">≈ ' + fmt(r.cout) + ' TND</span></div></div><button class="btn sm go" data-r="' + r.id + '">Simuler ▶</button></div>').join("") + "</div>";
+    body.querySelectorAll("[data-r]").forEach(b => (b.onclick = () => { const r = recs.find(x => x.id === b.dataset.r); prevL = Object.assign({}, S.layout, r.change); tab = "whatif"; render(); }));
+  }
+
+  // ---------------------------------------------------------------- What-If
+  function whatIfView(body) {
+    if (!prevL) prevL = Object.assign({}, S.layout);
+    const L = prevL;
+    body.innerHTML = '<div class="wi"><div class="card"><h3>Paramètres de l\'aménagement testé</h3>' +
+      rng("tableH", "Hauteur du plan de travail", 80, 100, 1, " cm", "ISO 14738 : plan ≈ hauteur du coude assis") +
+      rng("binDist", "Distance des bacs de tri (P01)", 30, 75, 5, " cm", "Zone d'atteinte normale ≤ 40 cm") +
+      rng("rotationMin", "Rotation entre tâches toutes les", 90, 270, 30, " min", "Ordre anti-transfert : contrôle → tri → étiquetage") +
+      rng("microPause", "Micro-pauses choisies par l'opératrice", 0, 6, 1, " min/h", "Facteur de récupération OCRA") +
+      chk("pupitre", "Pupitre incliné 15–20° + miroir (P02, P03)") + chk("dispenser", "Distributeur d'étiquettes décollées (P04, P05)") +
+      '<div class="row"><button class="btn go" id="tw3d">Voir dans le jumeau 3D</button><button class="btn" id="kz">Lancer un essai Kaizen (2 semaines)</button><button class="btn" id="rst">Réinitialiser</button></div></div><div id="wres"></div></div>';
+    body.querySelectorAll("input[data-k]").forEach(i => (i.oninput = () => { const k = i.dataset.k; L[k] = i.type === "checkbox" ? i.checked : +i.value; const o = body.querySelector("#o-" + k); if (o) o.textContent = i.value; result(); }));
+    body.querySelector("#tw3d").onclick = () => { S.preview = Object.assign({}, L); C.publish("lancement/twin/layout", { preview: S.preview }, { from: "Dashboard ingénieur", to: ["Jumeau 3D"] }); tab = "twin"; render(); };
+    body.querySelector("#rst").onclick = () => { prevL = Object.assign({}, S.layout); whatIfView(body); };
+    body.querySelector("#kz").onclick = () => { const r = compare(); S.kaizen.unshift({ id: "KZ-" + String(S.kaizen.length + 1).padStart(2, "0"), L: Object.assign({}, L), avant: r.b, apres: r.a, statut: "Planifié", debut: "J+1", fin: "J+14" });
+      C.publish("lancement/kaizen", { essai: S.kaizen[0].id, statut: "planifié" }, { from: "Dashboard ingénieur", to: ["Serveur edge"] }); tab = "kaizen"; render(); };
+    result();
+    function rng(k, label, mn, mx, st, u, hint) { return '<label class="rg"><span>' + label + ' : <b><output id="o-' + k + '">' + L[k] + "</output>" + u + '</b></span><input type="range" data-k="' + k + '" min="' + mn + '" max="' + mx + '" step="' + st + '" value="' + L[k] + '"><small>' + hint + "</small></label>"; }
+    function chk(k, label) { return '<label class="chk big"><input type="checkbox" data-k="' + k + '" ' + (L[k] ? "checked" : "") + "> " + label + "</label>"; }
+  }
+  function compare() { const b = E.simulateDay(S.layout, { dt: 30, seed: 11 }), a = E.simulateDay(prevL, { dt: 30, seed: 11 }); prev = a; return { b, a, tr: E.transferCheck(b, a) }; }
+  function result() {
+    const { b, a, tr } = compare(), box = document.getElementById("wres"); if (!box) return;
+    const row = s => { const x = b.sIdx[s.id], y = a.sIdx[s.id];
+      return "<tr><td><b>" + s.id + "</b> " + E.TASKS[s.task].name + "</td><td>" + rulaB(x.rula) + " → " + rulaB(y.rula) + "</td>" + E.ZK.map(z => "<td>" + badge(x.idx[z]) + " → " + badge(y.idx[z]) + "</td>").join("") + "</tr>"; };
+    const spread = z => { const v = a.wIdx.map(w => w[z]); return Math.min(...v) + "–" + Math.max(...v); };
+    box.innerHTML = '<div class="card"><h3>Résultat simulé sur une journée (7h30–17h00)</h3><div class="tablewrap"><table><thead><tr><th>Poste</th><th>RULA</th><th>Poignet</th><th>Coude</th><th>Épaule</th><th>Cou</th><th>Dos</th></tr></thead><tbody>' + E.STATIONS.map(row).join("") + "</tbody></table></div>" +
+      '<div class="verdicts"><div class="vd ' + (tr.ok ? "ok" : "bad") + '"><b>' + (tr.ok ? "✓ Aucun transfert de risque" : "⚠ Transfert de risque détecté") + "</b><span>" + (tr.ok ? "Aucune zone d'aucune opératrice ne passe au-dessus de 40 en augmentant (exigence M1)." : tr.issues.length + " cas : " + [...new Set(tr.issues.map(i => E.ZONES[i.zone].n))].join(", ") + " augmentent chez " + new Set(tr.issues.map(i => i.w)).size + " opératrice(s). Corriger d'abord l'aménagement, puis tourner.") + "</span></div>" +
+      '<div class="vd ' + (a.cadence.ok ? "ok" : "bad") + '"><b>' + (a.cadence.ok ? "✓ Cadence tenue" : "⚠ Cadence non tenue") + "</b><span>" + fmt(a.cadence.packets) + " paquets/jour estimés pour un objectif de " + fmt(E.PACKETS_TARGET) + (a.cadence.ok ? "." : " : compenser les micro-pauses par un gain de temps de cycle (pupitre, distributeur).") + "</span></div>" +
+      '<div class="vd"><b>Variation moyenne par zone (équipe)</b><span>' + E.ZK.map(z => E.ZONES[z].n + " " + (tr.delta[z] > 0 ? "+" : "") + tr.delta[z]).join(" · ") + "</span><small>Écart entre opératrices après changement : poignet " + spread("poignet") + ", épaule " + spread("epaule") + " (aucune opératrice n'est nommée).</small></div></div>" +
+      '<p class="note">Prévision du modèle de tâche, pas une mesure : chaque changement est validé par un essai de 2 semaines (protocole M3/M4) avant d\'être conservé.</p></div>';
+  }
+  function previewIdx(stId) { if (!S.preview || !prev) return null; const idx = prev.sIdx[stId].idx, max = Math.max(...E.ZK.map(k => idx[k])); return { lv: E.level(max), max, txt: "simulé · RULA " + fmt(prev.sIdx[stId].rula, 1) }; }
+
+  // ---------------------------------------------------------------- Kaizen
+  function kaizenView(body) {
+    body.innerHTML = '<div class="card"><h3>Boucle Kaizen (PDCA) : planifier, essayer 2 semaines, mesurer, garder ou revenir</h3>' + (S.kaizen.length ? '<div class="tablewrap"><table><thead><tr><th>Essai</th><th>Changements</th><th>RULA moyen avant → prévu</th><th>Zone max (équipe)</th><th>Statut</th><th></th></tr></thead><tbody>' +
+      S.kaizen.map((k, i) => { const ch = Object.keys(k.L).filter(x => k.L[x] !== S.layout[x] || k.statut === "Validé").map(x => x + " = " + k.L[x]).join(", ") || "—";
+        const rb = E.STATIONS.reduce((t, s) => t + k.avant.sIdx[s.id].rula, 0) / 5, ra = E.STATIONS.reduce((t, s) => t + k.apres.sIdx[s.id].rula, 0) / 5;
+        const zb = Math.max(...k.avant.wIdx.map(w => Math.max(...E.ZK.map(z => w[z])))), za = Math.max(...k.apres.wIdx.map(w => Math.max(...E.ZK.map(z => w[z]))));
+        return "<tr><td><b>" + k.id + "</b><br><small>" + k.debut + " → " + k.fin + "</small></td><td><small>" + esc(ch) + "</small></td><td>" + rulaB(rb) + " → " + rulaB(ra) + "</td><td>" + badge(zb) + " → " + badge(za) + '</td><td><span class="bdg ' + (k.statut === "Validé" ? "G" : k.statut === "Abandonné" ? "R" : "O") + '">' + k.statut + "</span></td><td>" + (k.statut === "Planifié" ? '<button class="btn sm go" data-ok="' + i + '">Valider après essai</button> <button class="btn sm" data-ko="' + i + '">Revenir en arrière</button>' : "") + "</td></tr>"; }).join("") + "</tbody></table></div>"
+      : '<p class="note">Aucun essai pour l\'instant. Lancez-en un depuis « Simulation What-If ».</p>') +
+      '<p class="note">Règle de validation (protocole terrain) : on garde le changement si le score RULA mesuré par la caméra baisse d\'au moins 1 point, si les signalements du poste baissent et si la cadence est tenue. Sinon, retour à l\'état initial.</p></div>';
+    body.querySelectorAll("[data-ok]").forEach(b => (b.onclick = () => { const k = S.kaizen[+b.dataset.ok]; k.statut = "Validé"; S.layout = Object.assign({}, k.L); S.preview = null; base = null;
+      C.publish("lancement/layout", { applique: k.L, essai: k.id }, { from: "Dashboard ingénieur", to: ["Serveur edge", "Jumeau 3D", "Vision"] }); render(); }));
+    body.querySelectorAll("[data-ko]").forEach(b => (b.onclick = () => { S.kaizen[+b.dataset.ko].statut = "Abandonné"; render(); }));
+  }
+
+  // ---------------------------------------------------------------- ROI
+  let roiP = Object.assign({}, E.ROI_DEFAULT);
+  function roiView(body) {
+    const r = E.roi(roiP), sc = [["Prudent", { reduc: 0.15, reducQual: 0.10, gainProd: 0.01 }], ["Central", {}], ["Favorable", { reduc: 0.45, reducQual: 0.30, gainProd: 0.03 }]].map(([n, o]) => [n, E.roi(Object.assign({}, roiP, o))]);
+    const inp = (k, l, st, u) => '<label class="rg"><span>' + l + '</span><input type="number" data-k="' + k + '" step="' + st + '" value="' + roiP[k] + '"><small>' + (u || "") + "</small></label>";
+    body.innerHTML = '<div class="wi"><div class="card"><h3>Hypothèses (modifiables)</h3>' + inp("salaireBrut", "Salaire brut mensuel (TND)", 10, "SMIG 48 h 2026 : 554,736 TND + primes") + inp("absJours", "Jours d'absence TMS / an au poste", 5, "à vérifier avec les RH") +
+      inp("departsAn", "Départs / an au poste", 0.5, "") + inp("gainProd", "Gain de productivité (part)", 0.005, "temps de cycle, déplacements") + inp("reduc", "Réduction absences, départs, MP (part)", 0.05, "Rivilis 2008 : effet partiel à modéré") + inp("postes", "Postes équipés dans la section", 1, "") +
+      inp("capexPoste", "Coût par poste (TND)", 50, "caméras, tablette, terminal, aménagements") + inp("capexPartage", "Coût partagé section (TND)", 50, "serveur edge, réseau, industrialisation") + '</div><div class="card"><h3>Résultat</h3>' +
+      '<div class="kpis"><div class="kpi"><span>Gains par poste</span><b>' + fmt(r.gainPoste) + '<small> TND/an</small></b></div><div class="kpi"><span>Retour sur investissement (par poste)</span><b>' + fmt(r.paybackPoste, 1) + '<small> mois</small></b></div><div class="kpi"><span>Retour sur investissement (section)</span><b>' + fmt(r.paybackLigne, 1) + '<small> mois</small></b></div><div class="kpi"><span>ROI à 3 ans (section)</span><b>' + fmt(100 * r.roi3ans) + '<small> %</small></b></div></div>' +
+      '<table><thead><tr><th>Gain annuel par poste</th><th>TND</th></tr></thead><tbody>' + Object.entries({ absenteisme: "Absentéisme TMS", turnover: "Turnover", productivite: "Productivité", qualite: "Rebuts / reprises", maladiesPro: "Maladies professionnelles (reclassement)" }).map(([k, l]) => "<tr><td>" + l + "</td><td>" + fmt(r.g[k]) + "</td></tr>").join("") + "</tbody></table>" +
+      '<h3 style="margin-top:14px">Trois scénarios</h3><table><thead><tr><th></th><th>Gain/poste/an</th><th>ROI poste</th><th>ROI section</th></tr></thead><tbody>' + sc.map(([n, x]) => "<tr><td>" + n + "</td><td>" + fmt(x.gainPoste) + " TND</td><td>" + fmt(x.paybackPoste, 1) + " mois</td><td>" + fmt(x.paybackLigne, 1) + " mois</td></tr>").join("") + "</tbody></table>" +
+      '<p class="note">Mêmes formules que le document « Calcul économique ». Les maladies professionnelles évitées ne comptent que le coût de reclassement pour l\'entreprise (pas les 21 000 € de coût moyen d\'un TMS en France, INRS), pour rester prudent.</p></div></div>';
+    body.querySelectorAll("input[data-k]").forEach(i => (i.onchange = () => { roiP[i.dataset.k] = +i.value; roiView(body); }));
+  }
+
+  function mount(el) { root = el; render(); }
+  G.Engineer = { mount, render, previewIdx };
+})(window);
+
+// ErgoTwin Lancement — espace Médecin du travail (login séparé). Seul rôle autorisé à voir les données individuelles (D1).
+(function (G) {
+  "use strict";
+  const E = G.Engine, C = G.Core, S = C.S;
+  let root, tab = "cl", zf = "all", hist = null;
+  const LB = { R: "Zone rouge", O: "À surveiller", G: "Faible" };
+  function loginView(msg) {
+    root.innerHTML = '<div class="login card"><h2>🩺 Espace Médecin du travail</h2><p class="note">Données individuelles de santé et d\'exposition : accès réservé au médecin du travail. Elles appartiennent à l\'opératrice et ne servent jamais à évaluer ou sanctionner (D1).</p>' +
+      '<form id="lf"><label>Identifiant<input id="lu" autocomplete="username"></label><label>Mot de passe<input id="lp" type="password" autocomplete="current-password"></label><button class="btn go">Se connecter</button><p class="err">' + (msg || "") + '</p></form><p class="note">Démo : <code>medecin</code> / <code>Sante#2026</code></p></div>';
+    root.querySelector("#lf").onsubmit = e => { e.preventDefault(); const r = C.login(root.querySelector("#lu").value, root.querySelector("#lp").value);
+      if (r.ok && r.role === "doctor") render(); else if (r.ok) { C.logout(); loginView("Ce compte n'a pas accès à l'espace médecin."); } else loginView(r.msg); };
+  }
+  // règles d'exposition issues des tableaux de maladies professionnelles (à valider par le médecin / l'ISST)
+  function flags(Ex, anc) {
+    const F = { poignet: [], coude: [], epaule: [] };
+    if (Ex.poignet >= 60) F.poignet.push("Tendinite / ténosynovite, De Quervain (délai 30 j)");
+    if (Ex.poignet >= 60 && anc >= 5) F.poignet.push("Canal carpien (90 j, exposition ≥ 5 ans)");
+    if (Ex.coude >= 60) { F.coude.push("Épicondylite / épitrochléite (30 j)"); if (anc >= 1) F.coude.push("Canal cubital (90 j)"); }
+    if (Ex.epaule >= 210) F.epaule.push("Tendinopathie aiguë de la coiffe (30 j)");
+    if (Ex.epaule >= 120 || Ex.epaule90 >= 60) { F.epaule.push("Tendinopathie chronique (6 mois)"); if (anc >= 1) F.epaule.push("Rupture de la coiffe (1 an)"); }
+    return F;
+  }
+  function data() {
+    if (!hist) hist = E.history(30, 42);
+    return E.WORKERS.map((w, k) => {
+      const today = S.expoW[w.pid], idxT = E.zoneIndex(today, S.layout.microPause);
+      const sym = {}; E.ZK.forEach(z => { sym[z] = Math.round(100 * hist.reduce((t, h) => t + h.sympt[k][z], 0) / hist.length); });
+      S.answers.filter(a => a.pid === w.pid).forEach(a => Object.keys(a.zones).forEach(z => { if (a.zones[z]) sym[z] = Math.min(100, sym[z] + 10); }));
+      const Sx = {}; E.ZK.forEach(z => { Sx[z] = Math.round(hist.reduce((t, h) => t + h.day.wIdx[k][z], 0) / hist.length); });
+      const rec = (S.layout.microPause || 0) / 10, f = 1.15 - 0.15 * Math.min(rec, 1);
+      const R = {}; E.ZK.forEach(z => { R[z] = Math.round(Math.min(100, (0.6 * Sx[z] + 0.4 * sym[z]) * f)); });
+      const top = E.ZK.reduce((a, z) => (R[z] > R[a] ? z : a), "poignet");
+      return { w, k, today, idxT, sym, Sx, R, top, F: flags(hist[hist.length - 1].day.perW[k], w.anc), trend: hist.map(h => h.sympt[k][top] ? 1 : 0), ans: S.answers.filter(a => a.pid === w.pid) };
+    });
+  }
+  function render() {
+    if (!C.can("doctor")) return loginView();
+    const D = data();
+    root.innerHTML = '<div class="etop"><div><span class="eyebrow">Section Lancement · données individuelles · accès médecin</span><h2>🩺 Médecine du travail</h2></div><div class="who">' + C.AUTH.user + ' · ' + C.ROLE_TXT.doctor + ' <button class="btn sm" id="lo">Se déconnecter</button></div></div>' +
+      '<div class="tabs">' + [["cl", "Classement"], ["gl", "Statistiques globales"], ["ru", "Règles utilisées"]].map(x => '<button data-t="' + x[0] + '" class="' + (tab === x[0] ? "on" : "") + '">' + x[1] + "</button>").join("") + "</div>" +
+      (tab !== "ru" ? '<div class="tabs sm">' + [["all", "Toutes zones"], ["poignet", "Poignet"], ["coude", "Coude"], ["epaule", "Épaule"], ["cou", "Cou"]].map(x => '<button data-z="' + x[0] + '" class="' + (zf === x[0] ? "on" : "") + '">' + x[1] + "</button>").join("") + "</div>" : "") + '<div id="dbody"></div>';
+    root.querySelector("#lo").onclick = () => { C.logout(); loginView(); };
+    root.querySelectorAll("[data-t]").forEach(b => (b.onclick = () => { tab = b.dataset.t; render(); }));
+    root.querySelectorAll("[data-z]").forEach(b => (b.onclick = () => { zf = b.dataset.z; render(); }));
+    const body = root.querySelector("#dbody");
+    const val = d => (zf === "all" ? { v: Math.max(...E.ZK.map(z => d.R[z])), z: d.top } : { v: d.R[zf], z: zf });
+    if (tab === "cl") {
+      body.innerHTML = '<p class="note">Du plus exposé au moins exposé. Indice = (0,6 × sollicitation caméra + 0,4 × symptômes déclarés sur 30 j) × facteur de récupération. Touchez une ligne pour le détail.</p>' +
+        D.slice().sort((a, b) => val(b).v - val(a).v).map((d, i) => { const v = val(d), lv = E.level(v.v);
+          return '<div class="card drow" id="d' + i + '"><button class="row"><span class="rk">' + (i + 1) + '</span><span class="nm"><b>' + d.w.nom + " <small>(" + d.w.pid + ')</small></b><small>' + (S.assign[d.w.pid] ? "Aujourd'hui : " + S.assign[d.w.pid] : "Hors poste") + " · ancienneté " + d.w.anc + " ans · zone critique : " + E.ZONES[v.z].n + '</small><div class="bar"><i style="width:' + v.v + "%;background:" + E.COL[lv] + '"></i></div></span><span class="bdg ' + lv + '">' + v.v + " · " + LB[lv] + "</span></button>" +
+            '<div class="det"><p class="note">Antécédents : ' + d.w.hist + "</p>" + ["poignet", "coude", "epaule", "cou"].map(z => '<div class="zline"><b>' + E.ZONES[z].n + '</b> <span class="bdg ' + E.level(d.R[z]) + '">' + d.R[z] + "</span><small>Sollicitation S " + d.Sx[z] + " · symptômes C " + d.sym[z] + " % · aujourd'hui " + d.idxT[z] + "</small>" + ((d.F[z] || []).map(f => '<span class="fl on">' + f + "</span>").join("") || (d.F[z] ? '<span class="fl">Aucun seuil de tableau atteint</span>' : "")) + "</div>").join("") +
+            '<p class="note">Symptômes déclarés (30 j), zone critique :</p><div class="hist">' + d.trend.map(x => '<i style="height:' + (x ? 28 : 4) + 'px"></i>').join("") + "</div>" +
+            (d.ans.length ? '<p class="note">Questionnaire du jour : ' + d.ans.map(a => "douleur " + (a.douleur ? "oui" : "non") + " ; " + (Object.keys(a.zones).map(z => E.ZONES[z].n + (a.zones[z] ? " +" : " –")).join(", ") || "pas de question ciblée")).join(" | ") + "</p>" : "") +
+            '<p class="note">Préférence de micro-pause : ' + S.prefs[d.w.pid].pause + "</p></div></div>"; }).join("");
+      body.querySelectorAll(".drow .row").forEach(b => (b.onclick = () => b.parentElement.classList.toggle("open")));
+    } else if (tab === "gl") {
+      const n = { R: 0, O: 0, G: 0 }; D.forEach(d => n[E.level(val(d).v)]++);
+      body.innerHTML = '<div class="kpis"><div class="kpi"><span>Opératrices suivies</span><b>' + D.length + '</b></div><div class="kpi"><span>Zone rouge</span><b style="color:#E5484D">' + n.R + '</b></div><div class="kpi"><span>À surveiller</span><b style="color:#B7791F">' + n.O + '</b></div><div class="kpi"><span>Faible</span><b style="color:#1E8A52">' + n.G + "</b></div></div>" +
+        '<div class="card"><h3>TMS multisites (≥ 2 zones à surveiller ou plus)</h3><p>' + D.filter(d => E.ZK.filter(z => d.R[z] >= 40).length >= 2).length + " opératrice(s) sur " + D.length + '. Définition du workshop : symptômes simultanés dans au moins 2 régions sur la période de référence.</p></div><div class="card"><h3>Questionnaire nordique</h3><p class="note">Version courte chaque jour à la sortie (1 question + questions ciblées). Version complète (9 zones, 7 jours et 12 mois, Kuorinka 1987) chaque semaine sur la tablette, et à T0, T+1 mois et T+3 mois pour le protocole.</p></div>';
+    } else {
+      body.innerHTML = '<div class="card rules"><h3>Principe</h3><p><b>Sollicitations cumulées</b> = intensité × répétition × durée ; <b>capacités + récupération</b> (modèle du workshop TMS).</p><h3>Seuils utilisés (à valider avec l\'ISST)</h3><ul><li><b>Poignet</b> : déviation > 15° (RULA) avec ≥ 10 gestes/min, ≥ 1 h/j → tendinites, De Quervain (30 j) ; canal carpien (90 j, ≥ 5 ans).</li><li><b>Coude</b> : prono-supination ≥ 10 mvts/min, ≥ 1 h/j → épicondylite (30 j), canal cubital (90 j).</li><li><b>Épaule</b> : bras ≥ 60° ≥ 2 h/j ou ≥ 90° ≥ 1 h/j → tendinopathie chronique (6 mois) ; ≥ 60° ≥ 3 h 30 → forme aiguë.</li><li><b>Cou / dos</b> : flexion > 25° / > 20° maintenue (ISO 11226, indicatif).</li></ul><h3>Niveaux</h3><p><span class="bdg R">≥ 65</span> suivi rapproché · <span class="bdg O">40–64</span> à surveiller · <span class="bdg G">&lt; 40</span> faible.</p><p class="note">Outil de dépistage qui aide le médecin, pas un diagnostic. Coefficients indicatifs.</p></div>';
+    }
+  }
+  function mount(el) { root = el; render(); }
+  G.Doctor = { mount, render };
+})(window);
+
+// ErgoTwin Lancement — vue « Liaison des systèmes » : architecture vivante + journal des messages + câblage du terminal.
+(function (G) {
+  "use strict";
+  const C = G.Core;
+  let root, logBox, filter = "";
+  const N = { // id: [x, y, w, label, sous-titre]
+    "Caméras CCTV": [20, 34, 175, "CCTV Cam-03", "existante · RTSP H.264"],
+    "Caméras rapprochées": [20, 108, 175, "Cam-L1 / Cam-L2", "2 MP PoE · poignets, coudes"],
+    "NVR": [222, 70, 130, "NVR / DVR", "flux secondaire 720p"],
+    "Vision": [386, 34, 200, "Vision", "RAM seulement · YOLOv8n + MediaPipe"],
+    "Serveur edge": [386, 140, 200, "Serveur edge", "MQTT · règles · API · SQLite chiffrée"],
+    "ESP32 + R307": [20, 252, 175, "Terminal ESP32 + R307", "comparaison dans le capteur"],
+    "Tablette": [222, 252, 140, "Tablette kiosque", "Galaxy Tab A9 · WSS"],
+    "Jumeau 3D": [628, 34, 180, "Jumeau numérique 3D", "WebGL · ray-casting"],
+    "Dashboard ingénieur": [628, 124, 180, "Dashboard ingénieur", "login · données agrégées"],
+    "Espace médecin": [628, 214, 180, "Espace médecin", "login · données individuelles"],
+  };
+  const EDGES = [["Caméras CCTV", "NVR"], ["Caméras rapprochées", "NVR"], ["NVR", "Vision"], ["Vision", "Serveur edge"], ["ESP32 + R307", "Serveur edge"], ["Serveur edge", "Tablette"], ["Tablette", "Serveur edge"],
+    ["Serveur edge", "Jumeau 3D"], ["Serveur edge", "Dashboard ingénieur"], ["Serveur edge", "Espace médecin"], ["Dashboard ingénieur", "Jumeau 3D"], ["Serveur edge", "Vision"]];
+  function center(n) { const [x, y, w] = N[n]; return [x + w / 2, y + 26]; }
+  function svg() {
+    let s = '<svg viewBox="0 0 820 320" class="arch"><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8A96A3"/></marker></defs>';
+    s += '<rect x="8" y="10" width="356" height="160" rx="12" class="zone z1"/><text x="18" y="26" class="zt">VLAN 10 · caméras (isolé, IEC 62443)</text>';
+    s += '<rect x="8" y="228" width="364" height="86" rx="12" class="zone z2"/><text x="18" y="244" class="zt">VLAN 20 · atelier (Wi-Fi WPA2-Entreprise)</text>';
+    s += '<rect x="376" y="10" width="220" height="200" rx="12" class="zone z3"/><text x="386" y="26" class="zt">Serveur local · aucune vidéo stockée</text>';
+    s += '<rect x="618" y="10" width="198" height="270" rx="12" class="zone z4"/><text x="628" y="26" class="zt">VLAN 30 · bureaux (HTTPS)</text>';
+    EDGES.forEach(([a, b], i) => { const p = center(a), q = center(b); s += '<line id="e' + i + '" x1="' + p[0] + '" y1="' + p[1] + '" x2="' + q[0] + '" y2="' + q[1] + '" class="ed" marker-end="url(#ar)"/>'; });
+    Object.keys(N).forEach(k => { const [x, y, w, l, st] = N[k]; s += '<g class="nd" id="n-' + k.replace(/\W/g, "") + '"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="52" rx="9"/><text x="' + (x + 10) + '" y="' + (y + 21) + '" class="t1">' + l + '</text><text x="' + (x + 10) + '" y="' + (y + 39) + '" class="t2">' + st + '</text><text x="' + (x + w - 10) + '" y="' + (y + 21) + '" class="cnt" text-anchor="end" id="c-' + k.replace(/\W/g, "") + '">0</text></g>'; });
+    return s + "</svg>";
+  }
+  function flash(msg) {
+    const tos = (msg.to || []).slice();
+    if (msg.from === "Vision") { ["Caméras CCTV", "Caméras rapprochées", "NVR"].forEach(k => (C.COUNT[k] = (C.COUNT[k] || 0) + 1)); [0, 1, 2].forEach(i => { const el = root && root.querySelector("#e" + i); if (el) { el.classList.remove("hot"); void el.getBBox(); el.classList.add("hot"); } }); } tos.forEach(t => { const i = EDGES.findIndex(e => e[0] === msg.from && e[1] === t); if (i >= 0) { const el = root && root.querySelector("#e" + i); if (el) { el.classList.remove("hot"); void el.getBBox(); el.classList.add("hot"); } } });
+    Object.keys(N).forEach(k => { const el = root && root.querySelector("#c-" + k.replace(/\W/g, "")); if (el) el.textContent = C.COUNT[k] || 0; });
+  }
+  function renderLog() {
+    if (!logBox) return;
+    logBox.innerHTML = C.LOG.filter(m => !filter || m.topic.indexOf(filter) >= 0).slice(0, 60).map(m => '<div class="lg' + (m.priv ? " priv" : "") + '"><span class="ts">' + C.hhmm(m.ts) + '</span><code>' + m.topic + '</code><span class="fr">' + m.from + " → " + (m.to.join(", ") || "—") + '</span><pre>' + (m.priv ? "🔒 contenu chiffré, visible seulement par le destinataire" : JSON.stringify(m.payload)) + "</pre></div>").join("");
+  }
+  const PINS = [["VIN 5V", "3 · VIN (4,2–6 V)", "#d33"], ["GND", "6 · GND", "#111"], ["GPIO16 · RX2", "4 · TX (TTL 3,3 V)", "#d9a400"], ["GPIO17 · TX2", "5 · RX", "#2a9d5c"], ["GPIO4 · réveil", "2 · Sout (doigt posé)", "#2f6fd0"], ["3V3", "1 · Vtouch 3,3 V", "#e07b00"]];
+  const WIRING = `<svg viewBox="0 0 820 330" class="wiring">
+  <text x="130" y="22" text-anchor="middle" class="h">ESP32-DevKitC (WROOM-32)</text><rect x="20" y="34" width="220" height="200" rx="10" class="pcb"/>
+  <text x="690" y="22" text-anchor="middle" class="h">Lecteur d'empreinte R307</text><rect x="560" y="34" width="250" height="200" rx="10" class="sensor"/>
+  ${PINS.map((r, i) => { const y = 64 + i * 28; return `<text x="228" y="${y + 4}" text-anchor="end" class="w">${r[0]}</text><circle cx="240" cy="${y}" r="4.5" fill="${r[2]}"/><path d="M240 ${y} C 400 ${y}, 400 ${y}, 560 ${y}" stroke="${r[2]}" stroke-width="2.6" fill="none"/><circle cx="560" cy="${y}" r="4.5" fill="${r[2]}"/><text x="574" y="${y + 4}" class="w">${r[1]}</text>`; }).join("")}
+  <text x="20" y="262" class="p">GPIO25 → 1 kΩ → transistor 2N2222 → buzzer 5 V (bip OK / erreur)</text>
+  <text x="20" y="282" class="p">GPIO26 → anneau LED WS2812 (vert = reconnu, rouge = réessayer)</text>
+  <rect x="470" y="250" width="340" height="62" rx="8" class="psu"/><text x="640" y="273" text-anchor="middle" class="p">Alimentation 5 V / 2 A USB-C (secteur)</text><text x="640" y="295" text-anchor="middle" class="p2">Wi-Fi 2,4 GHz → MQTT/TLS 8883 · secours USB-OTG</text>
+  </svg>`;
+  function mount(el) {
+    root = el;
+    el.innerHTML = '<div class="card"><h3>Liaison des systèmes en direct</h3><p class="note">Chaque action (pointage, posture, questionnaire, simulation) publie un message sur le bus MQTT du serveur local. Les flèches s\'allument quand un message passe ; les compteurs donnent le nombre de messages par composant. Ouvrez la tablette dans un autre onglet : les deux vues restent synchronisées.</p>' + svg() + '</div><div class="grid2"><div class="card"><h3>Journal des messages <input id="lf" placeholder="filtrer : pointage, vision, questionnaire…"></h3><div id="log" class="log"></div></div><div class="card"><h3>Câblage du terminal de pointage</h3>' + WIRING + '<ul class="note"><li>Le modèle d\'empreinte est stocké et comparé <b>dans le R307</b> (1 000 places) : seul un numéro de case sort du capteur. L\'ESP32 le remplace par un pseudonyme (HMAC-SHA256 avec clé locale) avant l\'envoi.</li><li>Liaison série 57 600 bauds, 8N1. Le R307 accepte une logique TTL 3,3 V : pas de convertisseur de niveau.</li><li>Sans réseau, l\'ESP32 garde jusqu\'à 200 événements en mémoire flash (NVS) et les renvoie, horodatés par NTP.</li></ul></div></div>';
+    logBox = el.querySelector("#log"); el.querySelector("#lf").oninput = e => { filter = e.target.value.trim(); renderLog(); };
+    renderLog(); flash({ to: [] });
+  }
+  let pending = false;
+  C.subscribe("#", (p, msg) => { flash(msg); if (!pending) { pending = true; setTimeout(() => { pending = false; renderLog(); }, 400); } });
+  G.Liaison = { mount };
+})(window);
+
+// ErgoTwin Lancement — assemblage : navigation, horloge de démonstration, synchronisation entre onglets.
+(function (G) {
+  "use strict";
+  const E = G.Engine, C = G.Core, S = C.S, $ = id => document.getElementById(id);
+  const VIEWS = { kiosk: "Tablette atelier", engineer: "Ingénieur 🔒", doctor: "Médecin 🔒", liaison: "Liaison des systèmes" };
+  let cur = "kiosk";
+  function go(v) {
+    cur = v; document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.v === v));
+    document.querySelectorAll(".view").forEach(s => (s.hidden = s.id !== "v-" + v));
+    if (v === "engineer") G.Engineer.render(); if (v === "doctor") G.Doctor.render();
+    try { if (location.hash.slice(1) !== v) history.replaceState(null, "", "#" + v); } catch (e) { /* cadre isolé */ }
+  }
+  function boot() {
+    $("nav").innerHTML = Object.keys(VIEWS).map(k => '<button data-v="' + k + '">' + VIEWS[k] + "</button>").join("");
+    $("nav").querySelectorAll("button").forEach(b => (b.onclick = () => go(b.dataset.v)));
+    G.Twin.computeVisibility();
+    G.Kiosk.mount($("v-kiosk")); G.Engineer.mount($("v-engineer")); G.Doctor.mount($("v-doctor")); G.Liaison.mount($("v-liaison"));
+    C.fastForward(10 * 60 + 15);   // la démo s'ouvre en milieu de matinée, avec les données du jour déjà accumulées
+    const sp = $("speed");
+    sp.onchange = () => (S.speed = +sp.value);
+    $("play").onclick = () => { S.running = !S.running; $("play").textContent = S.running ? "⏸" : "▶"; };
+    $("eod").onclick = () => { C.fastForward(16 * 60 + 55); };
+    setInterval(() => { $("clock").textContent = C.hhmm(S.clock); $("phase").textContent = S.clock >= E.DAY.lunch[0] && S.clock < E.DAY.lunch[1] ? "pause déjeuner" : S.clock >= E.DAY.end ? "fin de journée" : "production"; }, 300);
+    // synchronisation entre onglets (tablette dans un onglet, dashboard dans un autre)
+    try { const ch = new BroadcastChannel("ergotwin-lancement"); ch.onmessage = ev => { const m = ev.data; if (m && m.topic === "lancement/pointage" && m.payload) { const p = m.payload; if (p.action === "sortie") { S.assign[p.pid] = null; S.out[p.pid] = true; } else if (p.action === "pause") S.paused[p.pid] = true; else if (p.action === "reprise") S.paused[p.pid] = false; else if (p.station) { const o = C.occupant(p.station); if (o && o !== p.pid) S.assign[o] = null; S.assign[p.pid] = p.station; S.paused[p.pid] = false; } } }; } catch (e) { /* non supporté */ }
+    C.start();
+    const h = (location.hash || "").slice(1); go(VIEWS[h] ? h : "kiosk");
+    window.addEventListener("hashchange", () => { const k = location.hash.slice(1); if (VIEWS[k] && k !== cur) go(k); });
+  }
+  document.addEventListener("DOMContentLoaded", boot);
+})(window);
+</script>
+</body>
+</html>
